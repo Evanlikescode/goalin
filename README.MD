@@ -1,0 +1,70 @@
+
+# GOALIN ⚽
+Goalin adalah web aplikasi yang berfungsi sebagai tempat penjualan perlengkapan sepak bola. Latar belakang pemilihan nama didasari dengan kata "goal" yang selalu diteriakkan oleh para supporter ketika tim andalannya mencetak poin. Maka dari itu, sebagai pengembang dari toko ini, saya ingin menghadirkan energi positif kepada teman-teman pecinta bola bahwa kita selalu memiliki harapan dan hal itu dapat dimulai dengan mempersiapkan berbagai perlengkapan penting sebelum melakukan sesuatu, termasuk bermain bola.
+
+
+
+
+## Dokumentasi Pengembangan
+
+- Setup proyek dengan menginisiasi environment folder sebagai tempat menyimpang package dari proyek
+- Inisiasi git pada proyek aplikasi dan melakukan remote terhadap repository yang sudah dibuat di github dengan branch master
+- Membuat .gitignore file untuk mencegah sensitive files / folder, seperti .env dan folder env ikut ter-upload ke dalam repo
+- Aktivasi env folder dan melakukan instalasi beberapa package (django, python-dotenv, gunicorn, dkk) yang terdapat di requirements.txt
+- Melakukan running "django-admin startproject <nama_project> ." sebagai panel admin yang akan digunakan kelak
+- Inisiasi .env dan .env.prod files untuk konfigurasi environment variables, seperti database dan status production
+- Modifikasi settings.py untuk melakukan pembacaan .env dan .env.prod files pada aplikasi
+- Modifikasi allowed_hosts pada settings.py dengan menambahkan host lokal sehingga aplikasi dapat dijalankan pada browser secara lokal
+- Modifikasi pengaturan penggunaan database ketika production berstatus True dan False. Ketika True akan menggunakan database postgresql kampus dan False akan menggunakan sqlite yang sudah terdefinisikan pada proyek
+- Menjalankan command 'python3 manage.py startapp main' untuk inisiasi directory aplikasi main
+- Modifikasi INSTALLED_APPS di settings.py untuk menambahkan 'main' sebagai directory yang akan ikut serta dalam pengembangan proyek
+- Modifikasi urlpatterns pada urls.py di folder goalin_app dengan menambahkan parent url dari directory main (konteks di sini digunakan sebagai tampilan utama dari aplikasi web sehingga path(''))
+- Membuat folder templates pada folder main dan menginisiasi file layout.html dan landing_page.html. Di sini, layout.html berfungsi sebagai pondasi layouting setiap html file yang akan dibuat pada proyek ini. Lalu, pendukung layouting, CDN bootstrap 5.3 diikutsertakan. Kemudian, landing_page adalah html file yang berfungsi sebagai tampilan utama web aplikasi dengan melakukan extend terhadap file layout.html.
+- Modifikasi views.py di folder main dengan menambahkan function yang akan melakukan rendering terhadap landing_page.html dan mengirimkan context data yang akan ditampilkan pada landing_page.html
+- Modifikasi urls.py di folder main dengan menambahkan path untuk function landing_page sehingga fungsi tersebut terdaftar dalam routing aplikasi main 
+- Melakukan pembuatan tabel Product pada models.py di folder main dengan kolom-kolom utamanya adalah "name, price, description, thumbnail, category, is_featured" dan tambahan kolom "stock" sebagai data stok dari produk, "created_at" sebagai log datetime pembuatan produk, serta "updated_at" sebagai log datetime suatu produk mengalami perubahan. Lalu, menambahkan function "__str__" yang merepresentasikan string dari setiap objek dari Product
+- Menjalankan perintah "python3 manage.py makemigrations" untuk membuat berkas migrasi yang nantinya akan dieksekusi
+- Menjalankan perintah "python3 manage.py migrate" untuk memerintah django melakukan query terhadap config yang sudah disimpan dalam berkas migrasi dan mengaplikasikannya ke database
+- Setelah semua selesai, hal selanjutnya adalah konfigurasi proyek pada pws dengan melakukan penambahan project pada web pws, pengisian environment variables, dan penambahan remote repository pada git proyek. Kemudian, semua kode yang sudah dibuat di-push ke repository PWS sehingga nantinya proyek dapat diakses melalui jaringan internet (bukan localhost lagi).
+## Penjelasan Bagan
+Berikut link untuk bagan yang telah saya buat:
+https://ristek.link/bagan_ehw
+
+Penjelasan:
+- User akan mengirimkan request http ke web aplikasi. Lalu, web aplikasi akan menerima request melalui urls.py parent directory
+- Endpoint awal yang ditemukan akan diteruskan menuju urls.py dari app directory, sedangkan yang tidak ditemukan akan diteruskan dengan pesan 404 Not Found
+- Endpoint awal yang ditemukan sebelumnya ketika diteruskan menuju urls.py dari app directory akan dicek endpoint childnya. Jika terdaftar, akan diteruskan ke fungsi yang menaunginya di views.py. Namun, web akan mengirimkan 404 Not Found kembali ketika endpoint child tidak ditemukan
+- Endpoint child yang sebelumnya sudah terdaftar, ketika dikirim ke views.py, akan mengecek kebutuhan akses atau tidak ke models.py di app directory. Jika membutuhkan, maka request dikirimkan ke models.py dan views.py menerima hasil transaksi basis data tersebut. Namun, ketika tidak membutuhkan, proses langsung menjalani rendering html.
+- Rendering html akan terjadi ketika filepath html yang berada pada fungsi di views.py itu exist (ada) di folder app/templates. Jika tidak, akan diteruskan dengan pesan 500 server error.
+## Peran settings.py 
+Settings.py merupakan file krusial yang mengatur berbagai konfigurasi dari proyek Django untuk dapat dijalankan sebagaimana mestinya. Pengaturan itu, meliputi
+
+- Konfigurasi basis data: di file ini akan disimpan berbagai informasi untuk koneksi ke engine database. Lalu, di sini juga mengatur bagaimana penggunaan basis data di proyek Django (apakah seterusnya menggunakan database yang sama atau bisa ada 2 / lebih database berbeda)
+- Pengaturan INSTALLED_APPS: setiap kali ada perintah, seperti 'python3 manage.py startapp <nama_aplikasi>', nama aplikasi harus didaftarkan di file ini sehingga proyek Django akan mengenalinya dan mengeksekusi. Hal tersebut berlaku untuk setiap aplikasi yang dibuat programmer ataupun bawaan Django-nya.
+- Konfigurasi middleware: banyak hal di belakang layar sudah di-handle oleh Django. Contohnya adalah middleware untuk mengetahui apakah user sudah login atau belum. Maka, settings.py berfungsi sebagai tempat penyimpanan berbagai middleware yang sebelumnya telah ada di Django ataupun yang akan kita buat sendiri.
+- Pengaturan lokasi templates dan static files: berbagai file html dan css sudah terkonfigurasi nama folder penyimpanannya dan informasi mengenai bagaimana Django mengetahuinya disimpan juga di settings.py
+- Konfigurasi sistem keamanan: Django memiliki kecanggihan dalam menjaga proyeknya secara internal ataupun eksternal. Oleh sebab itu, framework ini mewajibkan setiap penggunanya untuk mendaftarkan host yang dapat mengakses proyek dan kerangka juga melibatkan kita mengatur berbagai sistem keamanan lainnya, seperti apakah setiap saat DEBUG dan PRODUCTION aplikasi terus berjalan atau tidak.
+- Pengaturan Zona Waktu: Django juga telah menyediakan konfigurasi untuk penggunaan zona waktu pada proyek kita di settings.py sehingga kita dapat menyesuaikannya sesuai yang kita inginkan.
+
+
+## Cara kerja migrasi database di Django
+
+- Langkah pertama: membuat struktur tabel yang diinginkan di models.py
+- Langkah kedua: jalankan perintah "python3 manage.py makemigrations"
+- Langkah ketiga: jalankan perintah "python3 manage.py migrate"
+
+Langkah-langkah di atas terlihat begitu mudah dan cukup simpel untuk dilakukan. Namun, di belakang layar, Django melakukan beberapa langkah untuk memastikan proses ini berjalan lancar.
+
+Maka, proses itu adalah
+
+- Ketika perintah "python3 manage.py makemigrations" berjalan, django akan membaca dan melakukan perbandingan antara models.py dengan file migration sebelumnya (jika sudah ada) serta membentuk file baru yang berisi instruksi-instruksi python untuk melakukan pembuatan atau pengubahan tabel. File ini terletak pada folder migrations yang ada di app directory.
+- Kemudian, ketika perintah "python3 manage.py migrate" dieksekusi, django akan membaca migration file yang ada di folder migrations itu dan mengubah setiap instruksi dari python ke query database yang dipakai pengembang aplikasi. Contohnya, jika menggunakan mysql, maka instruksi python yang ada di file migration akan diubah ke query mysql. Setelah itu, query dijalankan di engine database dan tabel yang didefinisikan sebelumnya di models.py terbentuk di basis data.
+## Kenapa Django?
+Django adalah kerangka / framework web berbasis bahasa pemrograman Python yang menggunakan arstiektur MVT (model - view - template). Kerangka ini dikenal dengan pendekatan batteries included yang artinya ia sudah dilengkapi dengan berbagai fitur bawaan fundamental, seperti ORM, sistem template, dan lainnya. Maka, tidak salah jika dikatakan bahwa Django dapat menjadi opsi untuk mengembangkan sebuah aplikasi web dengan cepat dan efisien secara waktu. 
+
+Alasan framework ini digunakan sebagai permulaan pembelajaran pengembangan perangkat lunak adalah karena,
+- mahasiswa fasilkom angkatan 2024 memulai pembelajaran bahasa pemrograman dengan bahasa python sehingga hal tersebut secara gamblang dapat memperlihatkan kegunaan mempelajari bahasa tersebut pada real-case (situasi. sebenarnya)
+- django adalah framework besar dan hal itu dapat dijadikan acuan untuk mempelajari framework lainnya, seperti laravel, springboot, nestjs, dan lain-lain karena sebagian besar framework serupa memiliki arsitektur MVC/MVT
+- django tidak hanya mengajarkan sisi frontend atau backend saja, tetapi dapat mengajarkan keduanya dalam satu waktu (fullstack web development). Hal tersebut akhirnya memberikan gambaran kepada mahasiswa mengenai pengembangan web secara garis besar seperti apa dan cara membuat web aplikasi itu bagaimana prosesnya.
+## Feedback untuk asisten dosen
+Sejauh ini, tutorial sangat membantu saya dalam mempelajari framework Django karena penjelasannya sangat detail dan mudah dipahami. Saran saya ke depan adalah tetap dipertahankan dalam pemberian tutorial, seperti kemarin dan tidak lupa untuk selalu memberikan kesempatan kepada para mahasiswa ketika ingin memperdalam suatu hal berkaitan dengan django ataupun web development. Terima kasih sudah selalu hadir dan fast-response, tim Asdos PBP! 🚀
