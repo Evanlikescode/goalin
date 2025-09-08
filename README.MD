@@ -11,7 +11,7 @@ Goalin adalah web aplikasi yang berfungsi sebagai tempat penjualan perlengkapan 
 - Inisiasi git pada proyek aplikasi dan melakukan remote terhadap repository yang sudah dibuat di github dengan branch master
 - Membuat .gitignore file untuk mencegah sensitive files / folder, seperti .env dan folder env ikut ter-upload ke dalam repo
 - Aktivasi env folder dan melakukan instalasi beberapa package (django, python-dotenv, gunicorn, dkk) yang terdapat di requirements.txt
-- Melakukan running "django-admin startproject <nama_project> ." sebagai panel admin yang akan digunakan kelak
+- Melakukan running "django-admin startproject <nama_project> ." sebagai pembuatan project django dan panel admin yang akan digunakan kelak
 - Inisiasi .env dan .env.prod files untuk konfigurasi environment variables, seperti database dan status production
 - Modifikasi settings.py untuk melakukan pembacaan .env dan .env.prod files pada aplikasi
 - Modifikasi allowed_hosts pada settings.py dengan menambahkan host lokal sehingga aplikasi dapat dijalankan pada browser secara lokal
