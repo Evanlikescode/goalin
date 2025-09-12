@@ -48,7 +48,25 @@ def show_product(request, id=None):
     return render(request, "more_product.html", data)
 
 
-def show_json(request):
-    news_list = Product.objects.all()
-    json_data = serializers.serialize("json", news_list)
+def show_json(request, id=None):
+    if id is None:
+
+        product_list = Product.objects.all()
+        json_data = serializers.serialize("json", product_list)
+        return HttpResponse(json_data, content_type="application/json")
+    
+    product = Product.objects.filter(pk=id)
+    json_data = serializers.serialize("json", product)
     return HttpResponse(json_data, content_type="application/json")
+
+
+def show_xml(request, id=None):
+    if id is None:
+
+        product_list = Product.objects.all()
+        json_data = serializers.serialize("xml", product_list)
+        return HttpResponse(json_data, content_type="application/xml")
+    
+    product = Product.objects.filter(pk=id)
+    json_data = serializers.serialize("xml", product)
+    return HttpResponse(json_data, content_type="application/xml")
