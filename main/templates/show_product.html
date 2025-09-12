@@ -2,7 +2,7 @@
 
 
 {% block title %}
-Goalin
+Products
 {% endblock %}
 
 
@@ -22,11 +22,11 @@ Goalin
             <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
                 <img src="{{ product.thumbnail }}" class="card-img-top" width="200px" height="200px" alt="...">
                 <div class="card-body">
-                <h5 class="card-title">{{ product.name }} </h5>
+                    <h5 class="card-title"><a href="{% url 'main:show_product_id' product.id %}">{{ product.name }}</a> </h5>
 
-                <p class="card-text"><small class="text-body-secondary"> Category: {{ product.get_category_display }} <br>Stock: {{ product.stock }},  Price: {{ product.price }} </small></p>
-                <p class="card-text">{{ product.description|truncatechars:150 }}</p>
-                <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
+                    <p class="card-text"><small class="text-body-secondary"> Category: {{ product.get_category_display }} <br>Stock: {{ product.stock }},  Price: {{ product.price }} </small></p>
+                    <p class="card-text">{{ product.description|truncatechars:150 }}</p>
+                    <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
                 </div>
             </div>
             {% endfor %}

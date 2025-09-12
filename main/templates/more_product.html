@@ -1,0 +1,60 @@
+{% extends 'layout.html' %}
+
+
+{% block title %}
+More of Product
+{% endblock %}
+
+
+
+
+{% block content %}
+
+   
+    
+    <div class="container"> 
+       
+
+    {% if product %}
+        
+        <div class="card col-md-12  mx-2 my-2 p-3" style="border-radius: 15px;">
+            <img src="{{ product.thumbnail }}" class="card-img-top" width="400px" height="400px" style="border-radius: 25px;" alt="...">
+            <div class="card-body">
+            <h5 class="card-title">{{ product.name }} </h5>
+            
+            <p class="card-text"><small class="text-body-secondary"> 
+                {% if product.is_featured %}
+                <b>Featured</b>
+                {% else %}
+                <b>Not Featured</b>
+                {% endif %}
+                <br>
+                Category: {{ product.get_category_display }} 
+                <br>
+                Stock: {{ product.stock }},  Price: {{ product.price }} 
+            </small></p>
+            <p class="card-text">{{ product.description }}</p>
+            <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
+            </div>
+        </div>
+            
+            
+            
+       
+    {% endif %}
+    </div>
+
+   
+
+
+<!-- <div class="alert alert-warning p-3 mx-auto mt-3 " role="alert" style="width: 80%;text-align: center;">
+   
+    <h3>Nama Pengembang: <u>{{ creator_name }}</u></h3>
+    <h3 style="color: seagreen;">Kelas: <u>{{ creator_class }}</u></h3>
+    <br>
+    <br>
+    <h1 style="color: red;">COMING SOONN!</h1> -->
+<!-- </div> --> 
+
+
+{% endblock %}

@@ -42,10 +42,10 @@ def show_product(request, id=None):
     product = get_object_or_404(Product, pk=id)
 
     data = {
-        'data': product
+        'product': product
     }
 
-    return render(request, "more_product", data)
+    return render(request, "more_product.html", data)
 
 
 def show_json(request):
