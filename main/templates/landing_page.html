@@ -1,22 +1,53 @@
 {% extends 'layout.html' %}
 
+{% load static %}
+
 {% block title %}
 Goalin
 {% endblock %}
 
 
+
+
 {% block content %}
 
-
-<div class="alert alert-warning p-3 mx-auto mt-3 " role="alert" style="width: 80%;text-align: center;">
+    <div>
+        <h2 style="color: seagreen; text-align: center; font-size: 150px;">
+        {{app_name}}.
+        <br>
+        </h2>
+        <p style="color: seagreen; text-align: center;">A home where champions are called</p>
+    </div>
+    
+    <div class="container">
+         <div class="row " >
+        
+            <div class="card col-5  mx-2 my-2" style="width: 18rem;">
+                <img src="..." class="card-img-top" alt="...">
+                <div class="card-body">
+                <h5 class="card-title">Card title</h5>
+                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                </div>
+            </div>
+            
+            
+            
+        </div>
+    </div>
    
-    <h2 style="color: seagreen;">Nama Aplikasi: <u>{{app_name}}</u></h2>
+
+   
+
+
+<!-- <div class="alert alert-warning p-3 mx-auto mt-3 " role="alert" style="width: 80%;text-align: center;">
+   
     <h3>Nama Pengembang: <u>{{ creator_name }}</u></h3>
     <h3 style="color: seagreen;">Kelas: <u>{{ creator_class }}</u></h3>
     <br>
     <br>
-    <h1 style="color: red;">COMING SOONN!</h1>
-</div>
+    <h1 style="color: red;">COMING SOONN!</h1> -->
+<!-- </div> --> 
 
 
 {% endblock %}
