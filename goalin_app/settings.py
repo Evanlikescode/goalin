@@ -38,6 +38,10 @@ ALLOWED_HOSTS = [
     "evan-haryo-goalin.pbp.cs.ui.ac.id"
 ]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://evan-haryo-goalin.pbp.cs.ui.ac.id/"
+]
+
 
 # Application definition
 
