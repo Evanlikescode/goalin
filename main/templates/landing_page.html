@@ -1,6 +1,5 @@
 {% extends 'layout.html' %}
 
-{% load static %}
 
 {% block title %}
 Goalin
@@ -19,23 +18,35 @@ Goalin
         <p style="color: seagreen; text-align: center;">A home where champions are called</p>
     </div>
     
-    <div class="container">
-         <div class="row " >
+    <div class="container"> 
+        <div style="text-align: center;" class="p-3">
+            <a href="{% url 'main:create_product' %}" class="btn btn-secondary">Add Product</a>
+        </div>
+
+    {% if product_list %}
         
-            <div class="card col-5  mx-2 my-2" style="width: 18rem;">
-                <img src="..." class="card-img-top" alt="...">
+        <div class="row " >
+            {% for product in product_list %}
+            {% if product.is_featured %}
+            <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
+                <img src="{{ product.thumbnail }}" class="card-img-top" width="200px" height="200px" alt="...">
                 <div class="card-body">
-                <h5 class="card-title">Card title</h5>
-                <p class="card-text">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-                <p class="card-text"><small class="text-body-secondary">Last updated 3 mins ago</small></p>
+                <h5 class="card-title">{{ product.name }} </h5>
+
+                <p class="card-text"><small class="text-body-secondary"> Category: {{ product.get_category_display }} <br>Stock: {{ product.stock }},  Price: {{ product.price }} </small></p>
+                <p class="card-text">{{ product.description|truncatechars:150 }}</p>
+                <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
                 </div>
             </div>
+            {% endif %}
+            {% endfor %}
             
             
             
         </div>
+       
+    {% endif %}
     </div>
-   
 
    
 
