@@ -48,7 +48,7 @@ def show_product(request, id=None):
     return render(request, "more_product.html", data)
 
 
-def show_json(request, id=None):
+def show_product_json(request, id=None):
     if id is None:
 
         product_list = Product.objects.all()
@@ -60,7 +60,7 @@ def show_json(request, id=None):
     return HttpResponse(json_data, content_type="application/json")
 
 
-def show_xml(request, id=None):
+def show_product_xml(request, id=None):
     if id is None:
 
         product_list = Product.objects.all()
