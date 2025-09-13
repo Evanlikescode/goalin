@@ -119,3 +119,19 @@ Sejauh ini, tutorial sangat membantu saya dalam mempelajari framework Django kar
 
 ## Tutorial 2
 Tutorial kemarin sudah sangat baik. Dokumentasi pembelajaran yang diberikan mudah dipahami. Saya semakin salut dengan semua yang sudah disiapkan oleh tim Asdos PBP. Maka dari itu, saya mengucapkan terima kasih yang sebesar-besarnya.
+
+# Screenshot POSTMAN
+## Fetch All Products (JSON)
+- https://drive.google.com/file/d/1-KwJpqqiOVE2gzpKciVWkI6fDUp112rV/view?usp=sharing
+## Fetch All Products (XML)
+- https://drive.google.com/file/d/14PX8pvljL6fw9CNqz0evmgfD5B_wlbVh/view?usp=drive_link
+## Fetch Products By ID (JSON)
+- https://drive.google.com/file/d/1XkrYqsFp5lAuMWoPjA9pnMauBvZTnuOB/view?usp=drive_link
+## Fetch Products By ID (XML)
+- https://drive.google.com/file/d/1u3-R4_-55jxxoU8pN8cGD4REFcpRY9No/view?usp=drive_link
+
+# References
+- https://aws.amazon.com/compare/the-difference-between-json-xml/
+- https://docs.djangoproject.com/en/5.2/ref/csrf/
+- https://www.geeksforgeeks.org/html/difference-between-json-and-xml/
+- https://owasp.org/www-community/attacks/csrf#overview
