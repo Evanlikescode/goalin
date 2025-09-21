@@ -1,0 +1,69 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Register
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-5">
+        <form method="post">
+             {% csrf_token %}
+            <div class="row mb-3">
+                <h3 style="text-decoration: underline;">Register</h3>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ form.username.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.username }}
+                    {% if form.username.help_text %}
+                        <small>{{ form.username.help_text }}</small>
+                    {% endif %}
+                     <br>
+                    {% for error in form.username.errors %}
+                        <small><b>{{ error }}</b></small>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row mb-3">
+               <label class="col-sm-2 col-form-label">{{ form.password1.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.password1 }}
+                    {% if form.password1.help_text %}
+                        <small>{{ form.password1.help_text }}</small>
+                    {% endif %}
+                     <br>
+                    {% for error in form.password1.errors %}
+                        <small><b>{{ error }}</b></small>
+                    {% endfor %}
+                </div>
+            </div>
+             <div class="row mb-3">
+               <label class="col-sm-2 col-form-label">{{ form.password2.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.password2 }}
+                    {% if form.password2.help_text %}
+                        <small>{{ form.password2.help_text }}</small>
+                    {% endif %}
+                    <br>
+                    {% for error in form.password2.errors %}
+                        <small><b>{{ error }}</b></small>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if messages %}
+                <div class="row">
+                    {% for message in messages %}
+                    <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+
+            <button type="submit" class="btn btn-secondary " style="float: right; width: 9rem;">Register</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

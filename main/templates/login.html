@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+Login
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card p-5">
+        <form method="post">
+             {% csrf_token %}
+            <div class="row mb-3">
+                <h3 style="text-decoration: underline;">Login</h3>
+            </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">{{ form.username.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.username }}
+                   
+                    
+                </div>
+            </div>
+            <div class="row mb-3">
+               <label class="col-sm-2 col-form-label">{{ form.password.label }}</label>
+                <div class="col-sm-10">
+                    {{ form.password }}
+                    
+                </div>
+            </div>
+             
+
+            {% if messages %}
+                <div class="row">
+                    {% for message in messages %}
+                    <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
+
+            <button type="submit" class="btn btn-secondary " style="float: right; width: 9rem;">Login</button>
+            <p>Don't have an account? <br> <a class="row" href="{% url 'main:register_user' %}">Register Now</a></p>
+            
+
+        </form>
+    </div>
+</div>
+
+{% endblock %}

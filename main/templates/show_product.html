@@ -16,6 +16,12 @@ Products
        
 
     {% if product_list %}
+        <a href="?filter=all">
+            <button type="button">All Products</button>
+        </a>
+        <a href="?filter=my">
+            <button type="button">My Products</button>
+        </a> 
         
         <div class="row " >
             {% for product in product_list %}
@@ -24,7 +30,17 @@ Products
                 <div class="card-body">
                     <h5 class="card-title"><a href="{% url 'main:show_product_id' product.id %}">{{ product.name }}</a> </h5>
 
-                    <p class="card-text"><small class="text-body-secondary"> Category: {{ product.get_category_display }} <br>Stock: {{ product.stock }},  Price: {{ product.price }} </small></p>
+                    <p class="card-text"><small class="text-body-secondary"> 
+                        Category: {{ product.get_category_display }} 
+                        <br>Stock: {{ product.stock }},  
+                        Price: {{ product.price }} 
+                        <br>
+                        {% if product.user %}
+                        Seller: {{ product.user.username }}
+                        {% else %}
+                        Seller: Anonymous
+                        {% endif %}
+                    </small></p>
                     <p class="card-text">{{ product.description|truncatechars:150 }}</p>
                     <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
                 </div>
