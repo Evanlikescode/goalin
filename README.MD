@@ -40,6 +40,18 @@ Goalin adalah web aplikasi yang berfungsi sebagai tempat penjualan perlengkapan 
 - Modifikasi main/views.py kembali untuk menambahkan fungsi penampilan produk dalam json dan xml format; show_product_json -> show produk keseluruhan dan by id dengan json format, show_product_xml -> show produk keseluruhan dan by id dengan xml format
 - Modifikasi main/urls.py kembali untuk menambahkan path terhadap json dan xml format untuk penampilan data produk.
 - Implementasi penampilan produk secara keseluruhan dan by id, saya lakukan dalam satu fungsi dengan menambahkan default None pada parameter id dan ketika ada id yang ditulis akan mengembalikan data sesuai id dari produk secara khusus
+
+## DOKUMENTASI TUGAS 4
+- Modifikasi main/views.py dengan menambahkan fungsi registrasi, login, dan logout.
+- Fungsi registrasi menggunakan UserCreationForm untuk form pembuatan usernya; Fungsi login menggunakan AuthenticationForm untuk loginnya; Login dan logout akan menggunakan HttpResponseRedirect sebagai redirect page modulenya. Lalu, ada juga penambahan implementasi cookie yang menyimpan waktu last login dan akan dihapus ketika logout
+- Modifikasi main/models.py dengan menambahkan column user pada tabel Product sebagai foreign key yang akan menghubungkan antara tabel User dan Product
+- Modifikasi fungsi create_product dengan menambahkan saving user ke model Product
+- Modifikasi show_product dengan menambahkan adanya request query parameter terhadap filter product. "all" untuk semua barang tanpa melakukan pembedaan terhadap owner barang. "my" --> untuk semua barang milik owner yang login saat itu
+- Menambahkan decorator @login_required terhadap page landing_page, create_product, show_product, show_product_json, show_product_xml, dan logout_user sehingga halaman ini memerlukan kredensial login terlebih dahulu sebelum diakses/diekseskusi
+- Modifikasi main/templates/show_product.html dengan menambahkan adanya button untuk show product all dan my products 
+- Modifikasi main/templates/show_product.html, main/templates/more_product.html dan main/templates/landing_page.html untuk menambahkan informasi user terhadap kepemilikan product penjualan
+- Modifikasi juga di halaman landing_page.html dengan menambahkan informasi last login
+- Modifikasi templates/navbar.html untuk menambahkan href logout pada elemen navbar.
 # Penjelasan Bagan
 Berikut link untuk bagan yang telah saya buat:
 https://ristek.link/bagan_ehw
@@ -113,6 +125,67 @@ Cara kerja csrf token di django sendiri adalah
  - Jika tokennya sesuai dan hostnya sudah terdaftar di konfigurasi project directory, form akan dieksekusi berhasil.
 
 Maka dari itu, form di Django yang tidak menerapkan atau melibatkan csrf token, secara otomatis akan mendapatkan pesan error dengan himbauan wajib menerapkan csrf token.
+
+# Django AuthenticationForm (Kelebihan dan Kekurangan)
+Django AuthenticationForm adalah class bawaan django yang berfungsi untuk melakukan validasi login dengan menerima argumen, seperti request, username, dan password. Form ini digunakan untuk memeriksa apakah username dan password yang di-input user terdapat / sebelumnya tersimpan di sistem autentikasi Django atau tidak.
+
+## Kelebihan
+- __Ready to use__. Sistem ini sangat mudah untuk diimplementasikan dengan hanya melakukan import class AuthenticationForm pada aplikasi yang ingin kita gunakan
+- __Aman__. Django dengan module ini sudah menerapkan hashing pada form password sehingga tidak perlu khawatir dengan hal penyimpanan password pada basis data
+- __Fleksibel__. Authentication form secara gamblang sudah menyiapkan html view sendiri untuk penerapan form ini. Oleh sebab itu, developer yang ingin membuat aplikasi dengan cepat bisa menerapkannya secara cepat.
+
+## Kekurangan
+- __View Sederhana__. Meskipun, html view sudah disediakan, tetapi tampilannya sangat sederhana / tidak ada keindahan yang dibantu oleh css
+- __Hanya Menerima Username/Password__. Login yang dilakukan hanya dengan field username dan password. Selain kedua itu, tidak bisa diterapkan.
+- __Error message terbatas__. Pesan error yang disiapkan hanya pesan default yang biasa digunakan pada web sederhana.
+
+# Perbedaan Autentikasi dan Otorisasi
+## Autentikasi
+Autentikasi adalah suatu proses yang melakukan verifikasi identitas pengguna ketika masuk ke dalam suatu sistem yang terbatas (restricted). Hal nyata implementasi ini adalah pada proses login berlangsung.
+
+__Salah satu cara menerapkan Autentikasi di Django adalah dengan__ 
+- Pengecekan identitas, seperti username dan password yang di-input user dengan fungsi authenticate dan keterlibatan model User di dalamnya.
+- Jika authenticate berhasil, maka dengan fungsi login, user akan disimpan informasi pribadinya pada session yang dibuat melalui Django.
+
+## Otorisasi
+Otorisasi adalah proses yang melakukan verifikasi terhadap hak akses yang dimiliki oleh user. Hal ini sering ditemukan ketika seseorang hanya dapat mengakses halaman tertentu dengan beberapa kondisi.
+
+__Salah satu cara menerapkan Otorisasi di Django adalah dengan__ 
+- Semisal suatu halaman hanya dapat diakses oleh admin / staff, Maka kita dapat menambahkan decorator @staff_member_required(raise_exception=True) pada halaman yang ingin kita restriksi.
+- Hal ini diawali dengan import decorator itu dari django.contrib.auth.decorators 
+- Raise exception = true ini nantinya akan mengembalikan status http 403 yang mana artinya forbidden access
+
+# Kelebihan dan Kekurangan Session dan Cookies dalam Menyimpan State di Aplikasi Web
+## Session
+__Kelebihan__
+- Lebih aman karena menyimpan data di server / tidak di browser. Pada browser yang disimpan hanya session ID saja.
+- Dapat menyimpan data besar atau tidak terbatas hanya beberapa kilobytes.
+- Data pada session bisa dipindahkan ke cache, seperti redis atau memcache
+__Kekurangan__
+- Akses cenderung lebih lambat karena memakan waktu dalam hal akses melalui server
+- Tidak bisa diakses oleh client-side secara langsung atau butuh API sendiri dalam hal aksesnya
+- Membebankan server karena semakin banyak session yang disimpan, maka memori server pun semakin kecil
+
+## Cookies
+__Kelebihan__
+- Tidak membebankan server karena disimpan pada browser
+- Bisa diakses secara langsung oleh client-side tanpa harus ada perantara, seperti API
+- Masa expired cookies dapat diatur sehingga tidak langsung hilang ketika browser ditutup
+__Kekurangan__
+- Rentan terhadap XSS injection, jika tidak diamankan dengan biak
+- Kapasitas terbatas atau hanya 4 KB per cookies
+- Mudah dimanipulasi oleh pengguna karena tersimpan pada client-side 
+
+# Penggunaan Cookies Aman Secara Default?
+Tanpa ada konfigurasi dengan benar, cookies tergolong sangat rentan dalam hal keamanan karena data yang disimpan dalam browser sehingga manipulasi melalui client-side tidak dapat dipungkiri sering terjadi. Risiko utama yang terjadi adalah XSS injection dengan masalah lain yang mengikutinya, seperti CSRF attack dan session hijacking.
+
+XSS injection terjadi ketika attacker melakukan penyisipan kode javascript yang mengambil isi cookies dari targetnya. Jika ada session ID ataupun csrf token yang disimpan pada cookies, hal ini dapat menambah masalah karena attacker pun bisa melakukan manipulasi terhadap suatu sistem yang rentan dengan session ID atau csrf token tersebut.
+
+Django mengatasi permasalahan XSS ini dengan,
+- Melakukan auto escaping di template engine sehingga jika ada script pada html hanya akan tertampil sebagai teks
+- Menggunakan is_valid() sehingga attacker gagal melakukan injection xss melalui form yang biasanya sering mereka lakukan karena input data ke suatu form harus sesuai dengan apa yang diharapkan pada fieldnya
+- Penambahan CSP middleware sehingga setiap ada script js yang berasal dari sumber tidak dikenal otomatis diblokir / tidak dieksekusi
+- Menambahkan status True pada session_cookie_secure dan csrf_cookie_secure sehingga setiap cookie session id dan token csrf yang disimpan melalui cookie hanya dapat dikirim melalui HTTPS protokol
 # Feedback untuk asisten dosen
 ## Tutorial 1
 Sejauh ini, tutorial sangat membantu saya dalam mempelajari framework Django karena penjelasannya sangat detail dan mudah dipahami. Saran saya ke depan adalah tetap dipertahankan dalam pemberian tutorial, seperti kemarin dan tidak lupa untuk selalu memberikan kesempatan kepada para mahasiswa ketika ingin memperdalam suatu hal berkaitan dengan django ataupun web development. Terima kasih sudah selalu hadir dan fast-response, tim Asdos PBP! 🚀
