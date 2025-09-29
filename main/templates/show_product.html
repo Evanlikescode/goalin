@@ -16,13 +16,18 @@ Products
        
 
     {% if product_list %}
-        <a href="?filter=all">
-            <button type="button">All Products</button>
-        </a>
-        <a href="?filter=my">
-            <button type="button">My Products</button>
-        </a> 
+     
         
+        <div class="btn-group" role="group" >
+            <a href="?filter=all" class="btn btn-outline-primary">
+                All Products
+            </a>
+            <br>
+             <a href="?filter=my" class="btn btn-outline-primary">
+               My Products
+            </a>
+        </div>
+
         <div class="row " >
             {% for product in product_list %}
             <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
