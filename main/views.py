@@ -25,6 +25,7 @@ def landing_page(request):
         'app_name': 'goalin',
         'creator_name': 'Evan Haryo Widodo',
         'creator_class': 'PBP A',
+        'creator_npm': '2406435824',
         'product_list' : product_list,
         'last_login': request.COOKIES.get('last_login', 'Never')
 
@@ -43,8 +44,38 @@ def create_product(request):
         product_entry.save()
         return redirect('main:landing_page')
 
-    data = {'form': form}
-    return render(request, "create_product.html", data)
+    data = {
+        "form": form,
+        "form_action": reverse("main:create_product"),
+        "button_label": "Create",
+        "form_title": "Create Product",
+    }
+    return render(request, "product_form.html", data)
+
+@login_required(login_url="/login")
+def edit_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    form = ProductForm(request.POST or None, instance=product)
+    if form.is_valid() and request.method == "POST":
+        form.save()
+        return redirect('main:landing_page')
+
+    data = {
+        "form": form,
+        "product": product,
+        "form_action": reverse("main:edit_product", args=[product.id]),
+        "button_label": "edit",
+        "form_title": "Edit Product",
+    }
+    return render(request, "product_form.html", data)
+
+
+@login_required(login_url="/login")
+def delete_product(request, id):
+    product = get_object_or_404(Product, pk=id)
+    product.delete()
+    return HttpResponseRedirect(reverse('main:landing_page'))
+
 
 @login_required(login_url="/login")
 def show_product(request, id=None):
