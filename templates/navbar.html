@@ -1,14 +1,32 @@
 <nav class="navbar navbar-expand-lg ">
   <div class="container-fluid">
-    <!-- <a class="navbar-brand" href="#">Navbar</a> -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+
+    <a class="navbar-brand" href="{% url 'main:landing_page' %}">Goalin</a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav mx-auto">
-        <a class="nav-link active" aria-current="page" href="{% url 'main:landing_page' %}">Home</a>
-        <a class="nav-link" href="{% url 'main:show_product' %}">Product</a>
-        <a class="nav-link" href="{% url 'main:logout_user' %}">Logout</a>
+
+    <div class="collapse navbar-collapse justify-content-center position-relative" id="navbarNav">
+
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="{% url 'main:landing_page' %}">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'main:show_product' %}">Product</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="{% url 'main:logout_user' %}">Logout</a>
+        </li>
+      </ul>
+
+
+
+      <div class="d-lg-block ms-auto small ">
+        {% if user.is_authenticated %}  
+        <p><strong>{{ creator_name|default:user.username }}</strong> - {{ creator_class|default:"Class" }} <br> {{ creator_npm|default:"Student" }}</p>
+        {% endif %}
       </div>
     </div>
   </div>

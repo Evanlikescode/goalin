@@ -1,3 +1,25 @@
 body{
     background-color: aliceblue;
 }
+
+#header_name{
+    color: seagreen; 
+    text-align: center; 
+    font-size: 150px;
+}
+
+
+/* Mobile (umumnya max-width 767px) */
+@media screen and (max-width: 767px) {
+    #header_name {
+        font-size: 100px;
+    } 
+}
+
+/* iPad / tablet (umumnya 768px sampai 1024px) */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  #header_name {
+    font-size: 100px;
+    } 
+  /* Tambahkan styling khusus tablet/iPad di sini */
+}
