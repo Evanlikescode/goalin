@@ -1,5 +1,6 @@
-{% extends 'layout.html' %}
 
+{% extends 'layout.html' %}
+{% load static %}
 
 {% block title %}
 Products
@@ -12,13 +13,13 @@ Products
 
    
     
-    <div class="container"> 
+    <div class="container "> 
        
 
     {% if product_list %}
      
-        
-        <div class="btn-group" role="group" >
+        <br>
+        <div class="btn-group d-flex justify-content-center "  role="group" >
             <a href="?filter=all" class="btn btn-outline-primary">
                 All Products
             </a>
@@ -27,8 +28,9 @@ Products
                My Products
             </a>
         </div>
+        <br>
 
-        <div class="row " >
+        <div class="row justify-content-center " >
             {% for product in product_list %}
             <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
                 <img src="{{ product.thumbnail }}" class="card-img-top" width="200px" height="200px" alt="...">
@@ -48,6 +50,11 @@ Products
                     </small></p>
                     <p class="card-text">{{ product.description|truncatechars:150 }}</p>
                     <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
+                    {% if user.is_authenticated and product.user == user %}
+
+                    <a href="{% url 'main:edit_product' product.id %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'main:delete_product' product.id %}" class="btn btn-danger">Delete</a>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -55,21 +62,21 @@ Products
             
             
         </div>
-       
+    
+    {% else %}
+
+        <div class="d-flex justify-content-center" style="margin-top: 10%;">
+            <img src="{% static 'image/not_found.png' %}" alt="No product found" >
+            <h3>PRODUCT NOT FOUND <br> <small style="color: rgb(142, 10, 10);">please check again later</small> </h3>
+        </div>
     {% endif %}
+
+    
+
     </div>
 
    
 
-
-<!-- <div class="alert alert-warning p-3 mx-auto mt-3 " role="alert" style="width: 80%;text-align: center;">
-   
-    <h3>Nama Pengembang: <u>{{ creator_name }}</u></h3>
-    <h3 style="color: seagreen;">Kelas: <u>{{ creator_class }}</u></h3>
-    <br>
-    <br>
-    <h1 style="color: red;">COMING SOONN!</h1> -->
-<!-- </div> --> 
 
 
 {% endblock %}
