@@ -52,6 +52,17 @@ Goalin adalah web aplikasi yang berfungsi sebagai tempat penjualan perlengkapan 
 - Modifikasi main/templates/show_product.html, main/templates/more_product.html dan main/templates/landing_page.html untuk menambahkan informasi user terhadap kepemilikan product penjualan
 - Modifikasi juga di halaman landing_page.html dengan menambahkan informasi last login
 - Modifikasi templates/navbar.html untuk menambahkan href logout pada elemen navbar.
+
+## DOKUMENTASI TUGAS 5
+- ⁠Dari tugas 3, saya sudah mengimplementasikan CSS layouting dengan framework Bootstrap
+- ⁠⁠Langkah awal yang saya lakukan adalah melakukan import cdn links bootstrap di templates/layout.html
+- ⁠⁠Kemudian, saya membuat navbar pada folder templates di directory dengan melakukan import html code dari bootstrapnya dan modifikasi untuk isi navigationnya.
+- ⁠⁠Selanjutnya, saya modifikasi untuk setiap main content pada layouting dibungkus oleh class container-fluid sehingga setiap konten dapat menampilkan secara full-width
+- Lalu, saya modifikasi setiap komponen card pada landing page, more_product, dan show_product dengan card yang mengisi 12 kolom penuh pada layar medium ke atas, margin vertikal dan horizontal sebesar 2 unit bootstrap, dan padding 3 yang berarti jarak isi ke border sebesar 3 unit; Saya juga menambahkan button edit dan delete pada setiap card
+- Sebelum, beranjak lebih jauh ke views.py, saya melakukan penambahan konfigurasi di settings.py dengan menambahkan middleware yang berfungsi untuk pengaksesan static files dan konfigurasi untuk pengaksesan directory static ketika dalam proses pengembangan dan production
+- Setelah itu, saya modifikasi untuk card pada product_form, login.html, dan register.html dengan card bawaan bootstrap dan setiap elemen pada form diberi jarak ke bawah sebesar 3 unit bootstrap; Di product_form ini saya juga menerapkan layouting untuk edit dan create sehingga tidak perlu membuat template berbeda untuk proses pembuatan dan pengeditan product. Implementasi ini saya lakukan dengan memanfaatkan form_action dan attribute value pada setiap form input. 
+- Sesudah layouting template html, saya modifikasi untuk fungsi edit dan delete di main/views.py dengan melakukan restriksi juga dalam hal aksesnya, yakni harus authenticated user yang bisa mengakses. Kemudian, dalam context untuk edit saya tambahkan form action untuk membedakan antara create dan edit (begitu juga dalam context create)
+- Terakhir, saya menambahkan path url untuk edit dan delete di main/urls.py
 # Penjelasan Bagan
 Berikut link untuk bagan yang telah saya buat:
 https://ristek.link/bagan_ehw
@@ -186,6 +197,81 @@ Django mengatasi permasalahan XSS ini dengan,
 - Menggunakan is_valid() sehingga attacker gagal melakukan injection xss melalui form yang biasanya sering mereka lakukan karena input data ke suatu form harus sesuai dengan apa yang diharapkan pada fieldnya
 - Penambahan CSP middleware sehingga setiap ada script js yang berasal dari sumber tidak dikenal otomatis diblokir / tidak dieksekusi
 - Menambahkan status True pada session_cookie_secure dan csrf_cookie_secure sehingga setiap cookie session id dan token csrf yang disimpan melalui cookie hanya dapat dikirim melalui HTTPS protokol
+
+# Urutan Prioritas Pengambilan CSS Selector
+- Pertama: **!important** merupakan perintah dengan prioritas tertinggi. Jika ada perintah ini di css, secara otomatis css akan mengeksekusi yang tertempel dengan !important. Contoh: p { color: blue !important;}
+- Kedua: **inline** merupakan selector css dengan prioritas tertinggi kedua. CSS ini ditulis secara langsung di attribute tag html. Contoh: <p style="color: green;">Teks akan berwarna hijau.</p>
+- Ketiga: **ID selector** merupakan selector yang menargetkan atribut id pada sebuah elemen html. ID selector ini bersifat unik sehingga setiap tag html yang memiliki ID yang sama, css hanya akan menargetkan pada tag html dengan ID yang pertama kali muncul / ditulis. ID pun ditulis di attribute html Contoh: <h1> id="judul-utama"></h1> ; pada CSS ditulis dengan #judul-utama{color: black;}
+- Keempat: **Class selector** merupakan selector yang menargetkan atribut class pada sebuah elemen html. Class selector ini dapat menjangkau setiap tag html yang menggunakan class yang diinisiasi. Hal ini menyelesaikan permasalahan ketika ID selector memprioritaskan keunikan. Contoh: <h1> class="judul-utama"></h1> ; pada CSS ditulis dengan .judul-utama{color: black;}
+- Kelima: **element/html tag selector** merupakan selector yang secara khusus langsung menggapai tag html yang di-define di .html; Contoh: <h1>halo</h1> ; pada CSS ditulis dengan h1 {color: black;}
+
+# Alasan Responsive Design Penting
+Responsive design merupakan pendekatan design web yang membuat tampilan secara otomatis beradaptasi dengan berbagai ukuran layar perangkat, seperti desktop, mobile, dan tablet. Konssep ini sangat penting diterapkan karena
+- **web dapat dibuka melalui berbagai perangkat**: tantangan terbesar front-end developer adalah menyajikan responsive design. Pengguna web saat ini tidak hanya melalui desktop, tetapi dominansi penggunaan mobile / handphone juga sudah semakin besar sehingga dengan responsive design, web dapat menampilkan tampilannya yang menyesuaikan ukuran layar perangkat.
+- **meningkatkan User Experience**: dengan responsive design, otomatis pengguna dapat mengalami pengalaman yang sangat baik karena setiap fitur dari web dapat diakses dengan mudah / tidak berantakan
+- **membuat web bersifat SEO friendly**: Google secara eksplisit merekomendasikan situs yang mobile-friendly sehingga situs yang menerapkan responsive design akan terindeks lebih baik daripada yang tidak. Biasanya nilai SEO bisa dicek di lighthouse yang ada di inspect element browser chrome
+- **mengurangi biaya dan waktu**: dengan menerapkan responsive design, developer tidak perlu membuat dua website berbeda untuk setiap platform sehingga hal ini menghemat biaya dan waktu yang dikeluarkan.
+
+# Contoh Web dengan Responsive Design
+- **kompas.com**: web ini sudah menerapkan responsive design karena web berita tidak hanya diakses melalui desktop saja, tetapi mayoritas diakses melalui mobile. Salah satu bukti web ini sudah menerapkan konsep responsive adalah card pada berita yang tadinya terurut dengan melebar ke samping, pada tampilan mobile semua terurut ke bawah.
+- **tokopedia.com**: web e-commerce ini pun sudah menerapkan responsive design. Meskipun, e-commerce ini tersedia juga pada aplikasi mobile, tetapi para developer tetap membuat webnya bersifat responsive. Hal itu dikarenakan tidak semua user langsung melakukan installation terhadap aplikasinya. Banyak user baru terkadang masih akses melalui web yang mana hal itu pun turut meningkatkan peluang bisnis dari pihak aplikasi dan pegiat industri/usaha. Salah satu bukti responsive adalah navbar pada web ini akan mengecil ketika ditampilkan secara mobile dan melebar ketika desktop.
+
+# Contoh Web dengan Tidak Menerapkan Responsive Design
+- **academic.ui.ac.id**: web ini belum menerapkan responsive design secara penuh karena web ini memerlukan zoom-in dan zoom-out untuk mengakses berbagai fitur. Contoh saja ketika login, saya harus melakukan zoom-in terlebih dahulu untuk mengisi kredensial login. Lalu, ketika akses berbagai fitur pada navbar pun perlu di zoom-in untuk melihat nama fiturnya dan menekan tombolnya.
+
+# Margin, Border, dan Padding
+## Margin
+Margin adalah ruang terluar yang melindungi border, padding, dan content. Margin berfungsi untuk memberikan jarak antar elemen. Contoh implementasinya adalah:
+
+- div {
+    margin: 10px; /* semua sisi berjarak 10px */
+    /* CARA LAIN */
+    margin-top: 5px; /* berjarak sebesar 5px dari sisi atas */
+    margin-right: 15px; /* berjarak sebesar 15px dari sisi kanan */
+    margin-bottom: 5px; /* berjarak sebesar 5px dari sisi bawah */
+    margin-left: 15px; /* berjarak sebesar 15px dari sisi kiri */}
+
+## Border
+Border adalah garis yang membungkus elemen dan terletak di bawah margin dan mengatasi padding serta content. Border di sini berguna untuk memberi batas visual suatu elemen. Contoh implementasinya:
+
+- div {
+    border: 2px solid black; /* membuat garis dengan tebal 2px; bertipe garis solid; berwarna hitam */
+    border-radius: 5px; /* membuat sudut melengkung sebsar 5px */
+}
+
+## Padding
+Padding adalah ruang dalam border yang mengatasi content. Ia terletak di antara border dan content. Fungsinya sendiri mirip dengan margin, yakni mengatur jarak elemen. Namun, bedanya padding mengatur dalam lingkup internal elemen sehingga konten dapat terlihat lebih baik/jelas. Contoh implementasi:
+
+- div {
+    padding: 20px; /* semua sisi berjarak 20px */
+    /* atau spesifik */
+    padding-top: 10px; /* berjarak sebesar 10px dari sisi atas */
+    padding-right: 15px; /* berjarak sebesar 15px dari sisi kanan */
+    padding-bottom: 10px; /* berjarak sebesar 10px dari sisi bawah */
+    padding-left: 15px; /* berjarak sebesar 15px dari sisi kiri */
+}
+
+# CSS Grid dan Flexbox
+## Flexbox
+Flexbox adalah metode layouting satu dimensi di CSS yang dapat mengatur, baik elemen secara horizontal (row) maupun vertikal (column). Flexbox bertujuan untuk memudahkan penyusunan atau pengaturan posisi elemen agar rapi, fleksibel, dan responsif.
+
+Penggunaan flexbox diawali dengan inisiasi:
+ - display: flex (mengaktifkan layouting secara flexbox)
+Setelah itu, kita dapat menggunakan berbagai attributnya, seperti
+- ⁠flex-direction: menentukan arah item 
+- ⁠⁠justify-content: mengatur posisi item secara horizontal
+- align-items: mengatur posisi item secara vertikal
+## Grid
+Grid adalah metode layouting dua dimensi di CSS yang mengatur secara horizontal (row) dan vertikal (column). Perbedaan dimensi dengan flexbox ini yang mengunggulkan grid dalam hal pengaturan secara presisi.
+
+Penggunaan grid diawali dengan inisiasi:
+- display: grid (mengaktifkan layouting secara grid)
+Setelah itu, kita dapat menggunakan berbagai attributenya, seperti
+- grid-template-columns: menentukan jumlah dan lebar kolom
+- ⁠⁠grid-template-rows: menentukan jumlah dan tinggi baris
+- grid-column atau grid-row: menentukan posisi item di grid
+
+Penggunaan flexbox dan grid dapat dilihat dari kebutuhan kita. Jika hanya ingin mengatur secara linear, tanpa mementingkan berbagai layouting yang sangat presisi —> **flexbox** dapat menjadi solusinya. Namun, ketika layouting sangat mementingkan lebar atau tinggi sebuah column/row —> **grid** menjadi solusinya
 # Feedback untuk asisten dosen
 ## Tutorial 1
 Sejauh ini, tutorial sangat membantu saya dalam mempelajari framework Django karena penjelasannya sangat detail dan mudah dipahami. Saran saya ke depan adalah tetap dipertahankan dalam pemberian tutorial, seperti kemarin dan tidak lupa untuk selalu memberikan kesempatan kepada para mahasiswa ketika ingin memperdalam suatu hal berkaitan dengan django ataupun web development. Terima kasih sudah selalu hadir dan fast-response, tim Asdos PBP! 🚀
@@ -208,3 +294,4 @@ Tutorial kemarin sudah sangat baik. Dokumentasi pembelajaran yang diberikan muda
 - https://docs.djangoproject.com/en/5.2/ref/csrf/
 - https://www.geeksforgeeks.org/html/difference-between-json-and-xml/
 - https://owasp.org/www-community/attacks/csrf#overview
+- https://www.codepolitan.com/blog/css-grid-vs-flexbox-5b4336849183d/
