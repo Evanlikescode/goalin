@@ -200,10 +200,10 @@ Django mengatasi permasalahan XSS ini dengan,
 
 # Urutan Prioritas Pengambilan CSS Selector
 - Pertama: **!important** merupakan perintah dengan prioritas tertinggi. Jika ada perintah ini di css, secara otomatis css akan mengeksekusi yang tertempel dengan !important. Contoh: p { color: blue !important;}
-- Kedua: **inline** merupakan selector css dengan prioritas tertinggi kedua. CSS ini ditulis secara langsung di attribute tag html. Contoh: <p style="color: green;">Teks akan berwarna hijau.</p>
-- Ketiga: **ID selector** merupakan selector yang menargetkan atribut id pada sebuah elemen html. ID selector ini bersifat unik sehingga setiap tag html yang memiliki ID yang sama, css hanya akan menargetkan pada tag html dengan ID yang pertama kali muncul / ditulis. ID pun ditulis di attribute html Contoh: <h1> id="judul-utama"></h1> ; pada CSS ditulis dengan #judul-utama{color: black;}
-- Keempat: **Class selector** merupakan selector yang menargetkan atribut class pada sebuah elemen html. Class selector ini dapat menjangkau setiap tag html yang menggunakan class yang diinisiasi. Hal ini menyelesaikan permasalahan ketika ID selector memprioritaskan keunikan. Contoh: <h1> class="judul-utama"></h1> ; pada CSS ditulis dengan .judul-utama{color: black;}
-- Kelima: **element/html tag selector** merupakan selector yang secara khusus langsung menggapai tag html yang di-define di .html; Contoh: <h1>halo</h1> ; pada CSS ditulis dengan h1 {color: black;}
+- Kedua: **inline** merupakan selector css dengan prioritas tertinggi kedua. CSS ini ditulis secara langsung di attribute tag html. Contoh: p style="color: green;">Teks akan berwarna hijau.
+- Ketiga: **ID selector** merupakan selector yang menargetkan atribut id pada sebuah elemen html. ID selector ini bersifat unik sehingga setiap tag html yang memiliki ID yang sama, css hanya akan menargetkan pada tag html dengan ID yang pertama kali muncul / ditulis. ID pun ditulis di attribute html Contoh: ""h1 id="judul-utama" /h1 ; pada CSS ditulis dengan #judul-utama{color: black;}
+- Keempat: **Class selector** merupakan selector yang menargetkan atribut class pada sebuah elemen html. Class selector ini dapat menjangkau setiap tag html yang menggunakan class yang diinisiasi. Hal ini menyelesaikan permasalahan ketika ID selector memprioritaskan keunikan. Contoh: h1 class="judul-utama" /h1 ; pada CSS ditulis dengan .judul-utama{color: black;}
+- Kelima: **element/html tag selector** merupakan selector yang secara khusus langsung menggapai tag html yang di-define di .html; Contoh: h1 halo /h1 ; pada CSS ditulis dengan h1 {color: black;}
 
 # Alasan Responsive Design Penting
 Responsive design merupakan pendekatan design web yang membuat tampilan secara otomatis beradaptasi dengan berbagai ukuran layar perangkat, seperti desktop, mobile, dan tablet. Konssep ini sangat penting diterapkan karena
