@@ -23,7 +23,7 @@
 
 
 
-      <div class="d-lg-block ms-auto small ">
+      <div class="d-lg-block  small ">
         {% if user.is_authenticated %}  
         <p><strong>{{ creator_name|default:user.username }}</strong> - {{ creator_class|default:"Class" }} <br> {{ creator_npm|default:"Student" }}</p>
         {% endif %}
