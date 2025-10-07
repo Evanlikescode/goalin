@@ -2,7 +2,7 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from main.models import Product
 from main.forms import ProductForm
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core import serializers
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -126,14 +126,22 @@ def show_product_xml(request, id=None):
 def register_user(request):
     form = UserCreationForm()   
 
-    msg_success = "Your account has been successfully created!"
 
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, msg_success)
-            return redirect('main:landing_page')
+            return JsonResponse({
+                "success": True,
+                "msg": "Your account has been successfully created!"
+            })
+        else:
+            return JsonResponse({
+                "success": False,
+                "msg": form.errors
+            })
+    
+    form = UserCreationForm()
     data = {
         "form": form
     }
@@ -148,11 +156,19 @@ def login_user(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            response = HttpResponseRedirect(reverse("main:landing_page"))
+            response = JsonResponse({
+                "success": True,
+                "msg": "Successfully Login!"
+            })
             response.set_cookie('last_login', str(datetime.datetime.now()))
             return response
-    else:
-        form = AuthenticationForm(request)
+        else:
+            return JsonResponse({
+                "success": False,
+                "msg": "Please check your username and password again!"
+            })
+    
+    form = AuthenticationForm(request)
     
     data = {
         'form': form

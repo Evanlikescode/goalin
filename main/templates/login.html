@@ -7,7 +7,7 @@ Login
 {% block content %}
 <div class="container">
     <div class="card p-5">
-        <form method="post">
+        <form method="post" id="login-form">
              {% csrf_token %}
             <div class="row mb-3">
                 <h3 style="text-decoration: underline;">Login</h3>
@@ -27,15 +27,11 @@ Login
                     
                 </div>
             </div>
-             
+            
+            <div id="login-message">
 
-            {% if messages %}
-                <div class="row">
-                    {% for message in messages %}
-                    <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
+            </div>
+
             
 
             <button type="submit" class="btn btn-secondary " style="float: right; width: 9rem;">Login</button>
@@ -45,5 +41,49 @@ Login
         </form>
     </div>
 </div>
+
+{% endblock %}
+
+
+{% block script %}
+
+<script>
+
+    const form = document.getElementById("login-form")
+    const msgBox = document.getElementById("login-message")
+
+    async function submitForm(e) {
+        e.preventDefault()
+        const formData = new FormData(form)
+
+        const response = await fetch("{% url 'main:login_user' %}", {
+            method: "POST",
+            headers: {"X-Requested-With": "XMLHttpRequest"},
+            body: formData
+        });
+
+        const data = await response.json()
+        msgBox.innerHTML = ""
+
+       if (data.success) {
+            msgBox.innerHTML = `<div class="alert alert-success">${data.msg}</div>`
+            setTimeout(() => window.location.href = "{% url 'main:landing_page' %}", 1000)
+        } else {
+            msgBox.innerHTML = `<div class="alert alert-danger">${data.msg}</div>`
+        }
+    }
+
+    form.addEventListener("submit", submitForm)
+
+
+
+
+
+
+
+
+
+
+</script>
 
 {% endblock %}
