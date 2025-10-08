@@ -52,17 +52,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("state-empty").remove()
   document.getElementById("state-error").remove()
 
-  function escapeHtml(str) {
-    if (str === null || str === undefined){
-      return ""
-    } 
-    return String(str)
-      .replace(/&/g, "&amp")
-      .replace(/</g, "&lt")
-      .replace(/>/g, "&gt")
-      .replace(/"/g, "&quot")
-      .replace(/'/g, "&#39")
-  }
 
   function showToast(msg, isError=false){
     const toastEl = document.getElementById("toast")
@@ -76,7 +65,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const categorySelect = document.getElementById("category")  
   let categoriesLoaded = false  
 
-  function populateCategorySelect(categories) {
+  function renderCategorySelect(categories) {
       categorySelect.innerHTML = '<option value="">Select Category</option>'
       categories.forEach(category => {
           const option = document.createElement("option")
@@ -91,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
     if (data.products && data.categories) {
         if (!categoriesLoaded) {
-            populateCategorySelect(data.categories)
+            renderCategorySelect(data.categories)
         }
         
 
@@ -122,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 {value: 'outdoor', label: 'Outdoor Items'},
                 {value: 'indoor', label: 'Indoor Items'}
             ]
-            populateCategorySelect(fallbackCategories)
+            renderCategorySelect(fallbackCategories)
         }
         
         return data.map(item => ({
@@ -152,14 +141,10 @@ document.addEventListener("DOMContentLoaded", () => {
         } 
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
       const data = await response.json()
       const products = parseResponse(data)
 
-      if (products.length === 0) {
+      if (products.length == 0) {
         productShow.innerHTML = emptyHTML
         return
       }
@@ -167,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
       renderProductList(products)
       
     } catch (err) {
-      console.error("fetchProducts error:", err)
       productShow.innerHTML = errorHTML
       showToast("Error loading products", true)
     }
@@ -183,14 +167,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (diffMins < 1) return 'just now'
     if (diffMins < 60) return `${diffMins} minutes ago`
     if (diffHours < 24) return `${diffHours} hours ago`
-    if (diffDays === 1) return '1 day ago'
+    if (diffDays == 1) return '1 day ago'
     return `${diffDays} days ago`
   }
 
 
   function renderProductList(products) {
     productShow.innerHTML = ""
-    const fallbackImage = "{% static 'image/no_image.png' %}"
 
     products.forEach(product => {
       const card = document.createElement("div")
@@ -203,8 +186,7 @@ document.addEventListener("DOMContentLoaded", () => {
       img.style.height = "200px"
       img.style.objectFit = "cover"
       img.alt = product.name
-      img.src = product.thumbnail && product.thumbnail.trim() !== "" ? product.thumbnail : fallbackImage
-      img.onerror = () => { img.src = fallbackImage }
+      img.src = product.thumbnail 
 
       const body = document.createElement("div")
       body.className = "card-body d-flex flex-column"
@@ -216,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const info = document.createElement("p")
       info.className = "card-text"
-      info.innerHTML = `<small><b>${escapeHtml(product.is_featured) == "true" ? `Featured` : `Not Featured`}</b><br><small>Category: ${escapeHtml(product.category)}<br>Stock: ${escapeHtml(product.stock)}<br>Price: ${escapeHtml(product.price)}</small><br>Seller: ${escapeHtml(product.username)}</small>`
+      info.innerHTML = `<small><b>${product.is_featured == "true" ? `Featured` : `Not Featured`}</b><br><small>Category: ${product.category}<br>Stock: ${product.stock}<br>Price: ${product.price}</small><br>Seller: ${product.username}</small>`
 
       const desc = document.createElement("p")
       desc.className = "card-text flex-grow-1"
@@ -225,14 +207,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const updated = document.createElement("p")
       updated.className = "card-text text-muted mb-2"
-      
+
       const updatedDisplay = product.updated_at ? getTimeAgo(new Date(product.updated_at)) : "-"
-      updated.innerHTML = `<small>Last updated ${escapeHtml(updatedDisplay)}</small>`
+      updated.innerHTML = `<small>Last updated ${updatedDisplay}</small>`
 
       const actions = document.createElement("div")
       actions.className = "mt-auto"
 
-      if (product.user_id && product.user_id.toString() === currentUserId) {
+      if (product.user_id && product.user_id.toString() == currentUserId) {
         const editBtn = document.createElement("button")
         editBtn.className = "btn btn-sm btn-warning me-1 btn-edit"
         editBtn.type = "button"
