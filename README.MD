@@ -272,6 +272,37 @@ Setelah itu, kita dapat menggunakan berbagai attributenya, seperti
 - grid-column atau grid-row: menentukan posisi item di grid
 
 Penggunaan flexbox dan grid dapat dilihat dari kebutuhan kita. Jika hanya ingin mengatur secara linear, tanpa mementingkan berbagai layouting yang sangat presisi —> **flexbox** dapat menjadi solusinya. Namun, ketika layouting sangat mementingkan lebar atau tinggi sebuah column/row —> **grid** menjadi solusinya
+
+# Perbedaan Synchronous dan Asynchronous Request
+## Synchronous 
+Permintaan secara sinkronus artinya adalah permintaan yang dilakukan secara langsung (direct) ke server. Hal ini memberikan kewajiban kepada setiap client yang request untuk melakukan reload page untuk mendapatkan respons dari server karena alur penerimaan respons berjalan secara serial.
+
+## Asynchronous
+Permintaan secara asynchronous merupakan permintaan yang dilakukan di belakang layar (menggunakan javascript). Jika pada sinkronus, user wajib melakukan reload page secara manual, mekanisme asinkronus akan menghilangkan kewajiban itu karena setiap event berjalan secara paralel dan semua respons server didapatkan serta dikembalikan melalui javascript.
+
+# Cara AJAX Bekerja di Django
+Semisal request-response dilakukan pada pengiriman data form.
+⁠- ⁠Client (browser): meminta user mengisi suatu form dan semua data pada form akan dikirimkan melalui javascript yang sudah membuat request ke server menggunakan XMLHttpRequest. Pada pengiriman ke server, javascript juga perlu menyertakan csrf token 
+- ⁠⁠Django: menerima request dan data yang dikirimkan oleh javascript, kemudian mengolah datanya serta diakhiri dengan mengirimkan respons berupa JsonResponse yang biasanya berisi status dan message.
+- ⁠Client (browser): Javascript menerima respons dari server dan melakukan update DOM HTML tanpa perlu mewajibkan user untuk reload page.
+
+# Keuntungan menggunakan AJAX dibandingkan render biasa
+- Request dan respons menuju/dari server jauh lebih cepat karena semua dinamika tersebut terjadi secara asinkronus dan tidak memerlukan reload page berulang kali
+- ⁠Setiap response yang dikirimkan hanya berupa JSON (bukan HTML secara keseluruhan)
+- ⁠⁠Web cenderung lebih interaktif karena dengan menggunakan javascript, manipulasi terhadap DOM HTML dapat dilakukan
+
+
+# Cara Memastikan Keamanan Penggunaan AJAX pada Login dan Register
+- Mengirimkan token CSRF setiap kali melakukan request sehingga tidak terjadi penyimpnagan yang tidak diinginkan
+- ⁠Menggunakan HTTPS setiap kali ada transaksi request-response
+- ⁠⁠Setiap input yang masuk melalui javascript tetap divalidasi oleh modul bawaan Django, seperti UserCreationForm atau AuthenticationForm
+- ⁠⁠Mendaftarkan host pada CORS ketika web front-end terpisah sehingga hal ini meminimalisir server menerima request / memberikan response ke host yang tidak dikenal
+
+# Cara AJAX Mempengaruhi Pengalaman Pengguna (User Experience) pada Website
+- AJAX memberikan pengalaman kepada para pengguna dengan interaksi yang lebih cepat. Hal ini terlihat ketika user tidak perlu melakukan reload berulang kali untuk mendapatkan suatu response dari server, khususnya ketika menginputkan data pada suatu form.
+- AJAX menghadirkan pengalaman yang lebih mengesankan karena user bisa mendapatkan berbagai notifikasi / informasi melalui toast, tampilan loading dengan spinner, dan lainnya.
+
+
 # Feedback untuk asisten dosen
 ## Tutorial 1
 Sejauh ini, tutorial sangat membantu saya dalam mempelajari framework Django karena penjelasannya sangat detail dan mudah dipahami. Saran saya ke depan adalah tetap dipertahankan dalam pemberian tutorial, seperti kemarin dan tidak lupa untuk selalu memberikan kesempatan kepada para mahasiswa ketika ingin memperdalam suatu hal berkaitan dengan django ataupun web development. Terima kasih sudah selalu hadir dan fast-response, tim Asdos PBP! 🚀
