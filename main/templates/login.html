@@ -7,7 +7,7 @@ Login
 {% block content %}
 <div class="container">
     <div class="card p-5">
-        <form method="post" id="login-form">
+        <form  id="login-form">
              {% csrf_token %}
             <div class="row mb-3">
                 <h3 style="text-decoration: underline;">Login</h3>
@@ -28,9 +28,6 @@ Login
                 </div>
             </div>
             
-            <div id="login-message">
-
-            </div>
 
             
 
@@ -42,6 +39,8 @@ Login
     </div>
 </div>
 
+{% include 'toast.html' %}
+
 {% endblock %}
 
 
@@ -49,8 +48,20 @@ Login
 
 <script>
 
+document.addEventListener("DOMContentLoaded", () => {
+
     const form = document.getElementById("login-form")
-    const msgBox = document.getElementById("login-message")
+    const toastElement = new bootstrap.Toast(document.getElementById("toast"))
+    const toastBody = document.getElementById("toast-body")
+
+    function showToast(msg, isError=false) {
+        const toastEl = document.getElementById("toast")
+        toastEl.className = "toast align-items-center border-0"
+        toastEl.classList.add(isError ? "text-bg-danger" : "text-bg-success")
+        toastBody.textContent = msg
+        toastElement.show()
+    }
+
 
     async function submitForm(e) {
         e.preventDefault()
@@ -63,17 +74,33 @@ Login
         });
 
         const data = await response.json()
-        msgBox.innerHTML = ""
 
        if (data.success) {
-            msgBox.innerHTML = `<div class="alert alert-success">${data.msg}</div>`
+            showToast(data.msg)
             setTimeout(() => window.location.href = "{% url 'main:landing_page' %}", 1000)
         } else {
-            msgBox.innerHTML = `<div class="alert alert-danger">${data.msg}</div>`
+            let errorMsg = "Login failed: "
+            if (typeof data.msg === 'string') {
+                errorMsg += data.msg
+            } else if (typeof data.msg === 'object') {
+                const errors = []
+                Object.entries(data.msg).forEach(([field, fieldErrors]) => {
+                    errors.push(`${field}: ${fieldErrors.join(", ")}`)
+                })
+                errorMsg += errors.join("; ")
+            } else {
+                errorMsg += "Please check your input"
+            }
+            showToast(errorMsg, true)
         }
     }
 
     form.addEventListener("submit", submitForm)
+
+
+
+
+})
 
 
 

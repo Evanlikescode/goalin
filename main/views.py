@@ -143,7 +143,7 @@ def show_product_json(request, id=None):
         })
 
     if id is None:
-        product_list = Product.objects.all().select_related('user')
+        product_list = Product.objects.all()
         products_data = []
         for product in product_list:
             products_data.append({
@@ -180,7 +180,7 @@ def show_my_product_json(request):
             'label': cat[1]
         })
 
-    product_list = Product.objects.filter(user=request.user).select_related('user')
+    product_list = Product.objects.filter(user=request.user)
     products_data = []
     for product in product_list:
         products_data.append({

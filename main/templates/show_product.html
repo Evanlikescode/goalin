@@ -5,7 +5,7 @@
   <div class="d-flex align-items-center mb-2">
     <div>
       <button id="refresh-btn" class="btn btn-outline-secondary me-2">Refresh</button>
-      <button id="add-btn" class="btn btn-primary">Add Product</button>
+      <button id="add-btn" class="btn" style="background-color: rgb(47, 107, 71); color: white;">Add Product</button>
     </div>
   </div>
 
@@ -46,8 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const currentUserId = "{{ request.user.id }}"
 
   const loadingHTML = document.getElementById("state-loading").outerHTML
-  const emptyHTML   = document.getElementById("state-empty").outerHTML
-  const errorHTML   = document.getElementById("state-error").outerHTML
+  const emptyHTML = document.getElementById("state-empty").outerHTML
+  const errorHTML = document.getElementById("state-error").outerHTML
   document.getElementById("state-loading").remove()
   document.getElementById("state-empty").remove()
   document.getElementById("state-error").remove()
@@ -173,6 +173,20 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getTimeAgo(date) {
+    const now = new Date()
+    const diffMs = now - date
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'just now'
+    if (diffMins < 60) return `${diffMins} minutes ago`
+    if (diffHours < 24) return `${diffHours} hours ago`
+    if (diffDays === 1) return '1 day ago'
+    return `${diffDays} days ago`
+  }
+
 
   function renderProductList(products) {
     productShow.innerHTML = ""
@@ -197,12 +211,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const title = document.createElement("h5")
       title.className = "card-title"
-      title.textContent = product.name
+      title.innerHTML = `<a href="${`/product/${product.id}`}"> ${product.name} </a>`
 
 
       const info = document.createElement("p")
       info.className = "card-text"
-      info.innerHTML = `<small>Category: ${escapeHtml(product.category)}<br>Stock: ${escapeHtml(product.stock)}<br>Price: ${escapeHtml(product.price)}</small><br>Seller: ${escapeHtml(product.username)}</small>`
+      info.innerHTML = `<small><b>${escapeHtml(product.is_featured) == "true" ? `Featured` : `Not Featured`}</b><br><small>Category: ${escapeHtml(product.category)}<br>Stock: ${escapeHtml(product.stock)}<br>Price: ${escapeHtml(product.price)}</small><br>Seller: ${escapeHtml(product.username)}</small>`
 
       const desc = document.createElement("p")
       desc.className = "card-text flex-grow-1"
@@ -211,14 +225,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const updated = document.createElement("p")
       updated.className = "card-text text-muted mb-2"
-      const updatedDisplay = product.updated_at ? new Date(product.updated_at).toLocaleString("en-GB", {
-        day: "2-digit", 
-        month: "short", 
-        year: "numeric", 
-        hour: "2-digit", 
-        minute: "2-digit"
-      }) : "-"
-      updated.innerHTML = `<small>Last updated: ${escapeHtml(updatedDisplay)}</small>`
+      
+      const updatedDisplay = product.updated_at ? getTimeAgo(new Date(product.updated_at)) : "-"
+      updated.innerHTML = `<small>Last updated ${escapeHtml(updatedDisplay)}</small>`
 
       const actions = document.createElement("div")
       actions.className = "mt-auto"
@@ -279,6 +288,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("category").value = product.category || ""
     document.getElementById("description").value = product.description || ""
     document.getElementById("thumbnail").value = product.thumbnail || ""
+    document.getElementById("is_featured").checked = product.is_featured == true 
 
     if (product.category && categoriesLoaded) {
         categorySelect.value = product.category
@@ -294,6 +304,8 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modalTitle").textContent = "Add Product"
     document.getElementById("product-form").reset()
     document.getElementById("product-id").value = ""
+    document.getElementById("is_featured").checked = false
+
     if (categoriesLoaded) {
       categorySelect.value = ""
     }
@@ -314,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append('category', document.getElementById("category").value)
     formData.append('description', document.getElementById("description").value)
     formData.append('thumbnail', document.getElementById("thumbnail").value)
+    formData.append('is_featured', document.getElementById("is_featured").checked)
     formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
 
     try {

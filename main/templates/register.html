@@ -7,7 +7,7 @@ Register
 {% block content %}
 <div class="container">
     <div class="card p-5">
-        <form method="post" id="register-form">
+        <form  id="register-form">
              {% csrf_token %}
             <div class="row mb-3">
                 <h3 style="text-decoration: underline;">Register</h3>
@@ -52,23 +52,34 @@ Register
                 </div>
             </div>
             
-            <div id="register-message">
-
-            </div>
 
             <button type="submit" class="btn btn-secondary " style="float: right; width: 9rem;" onsubmit="submitForm()">Register</button>
         </form>
     </div>
 </div>
 
+{% include 'toast.html' %}
+
+
 {% endblock %}
 
 {% block script %}
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("register-form")
-    const msgBox = document.getElementById("register-message")
+    const toastElement = new bootstrap.Toast(document.getElementById("toast"))
+    const toastBody = document.getElementById("toast-body")
+
+    function showToast(msg, isError=false) {
+        const toastEl = document.getElementById("toast")
+        toastEl.className = "toast align-items-center border-0"
+        toastEl.classList.add(isError ? "text-bg-danger" : "text-bg-success")
+        toastBody.textContent = msg
+        toastElement.show()
+    }
+
 
     async function submitForm(e) {
         e.preventDefault()
@@ -81,24 +92,34 @@ Register
         });
 
         const data = await response.json()
-        msgBox.innerHTML = ""
 
        if (data.success) {
-            msgBox.innerHTML = `<div class="alert alert-success">${data.msg}</div>`
+            showToast(data.msg)
             setTimeout(() => window.location.href = "{% url 'main:landing_page' %}", 1000)
         } else {
-            let errorMsg = `<div class="alert alert-danger"><ul>`
-            Object.entries(data.msg).forEach(([field, errors]) => {
-                errorMsg += `<li><strong>${field}:</strong> ${errors.join(", ")}</li>`
-            });
-            errorMsg += `</ul></div>`
-            msgBox.innerHTML = errorMsg
+            let errorMsg = "Registration failed: "
+            if (typeof data.msg === 'string') {
+                errorMsg += data.msg
+            } else if (typeof data.msg === 'object') {
+                const errors = []
+                Object.entries(data.msg).forEach(([field, fieldErrors]) => {
+                    errors.push(`${field}: ${fieldErrors.join(", ")}`)
+                })
+                errorMsg += errors.join("; ")
+            } else {
+                errorMsg += "Please check your input"
+            }
+            showToast(errorMsg, true)
         }
     }
 
     form.addEventListener("submit", submitForm)
 
 
+
+
+})
+    
 
 
 
