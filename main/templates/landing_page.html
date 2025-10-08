@@ -22,60 +22,8 @@ Goalin
         <p style="color: rgb(34, 66, 47); text-align: center; padding: 5px; font-family: sans-serif;"><small>Last Login: {{ last_login }}</small></p>
 
         <div class="container"> 
-            <div style="text-align: center;" class="p-3">
-                <a href="{% url 'main:create_product' %}" class="btn btn-secondary">Add Product</a>
-            </div>
 
-        {% if product_list %}
-            
-            <div class="row justify-content-center" >
-                {% for product in product_list %}
-                {% if product.is_featured %}
-                <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
-                    <img src="{{ product.thumbnail }}" class="card-img-top" width="200px" height="200px" alt="...">
-                    <div class="card-body">
-                        <h5 class="card-title"><a href="{% url 'main:show_product_id' product.id %}">{{ product.name }}</a> </h5>
-
-                        <p class="card-text"><small class="text-body-secondary"> 
-                            Category: {{ product.get_category_display }} 
-                            <br>Stock: {{ product.stock }},  
-                            Price: {{ product.price }} 
-                            <br>
-                            {% if product.user %}
-                            Seller: {{ product.user.username }}
-                            {% else %}
-                            Seller: Anonymous
-                            {% endif %}
-                        </small></p>
-                        <p class="card-text">{{ product.description|truncatechars:150 }}</p>
-                        <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
-                        {% if user.is_authenticated and product.user == user %}
-
-                        <a href="{% url 'main:edit_product' product.id %}" class="btn btn-warning">Edit</a>
-                        <a href="{% url 'main:delete_product' product.id %}" class="btn btn-danger">Delete</a>
-                        {% endif %}
-                    </div>
-                </div>
-                {% endif %}
-                {% endfor %}
-                
-                
-                
-            </div>
-        
-        {% else %}
-
-            <div class="d-flex justify-content-center" style="margin-top: 5%; border-style: inset;">
-                <img src="{% static 'image/not_found.png' %}" alt="No product found" >
-                <h3>PRODUCT NOT FOUND <br> <small style="color: rgb(142, 10, 10);">please check again later</small> </h3>
-            </div>
-
-            <br>
-            <br>
-        {% endif %}
-
-
-        </div>
+        {% include 'show_product.html' %}
 
         <p style="color: rgb(34, 66, 47); text-align: center; padding: 15px; font-family: sans-serif;"><small>Created by <br>{{ creator_name }}, {{ creator_class }}</small></p>
 

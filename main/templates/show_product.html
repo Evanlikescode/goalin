@@ -1,82 +1,398 @@
 
-{% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}
-Products
-{% endblock %}
-
-
-
-
-{% block content %}
-
-   
-    
-    <div class="container "> 
-       
-
-    {% if product_list %}
-     
-        <br>
-        <div class="btn-group d-flex justify-content-center "  role="group" >
-            <a href="?filter=all" class="btn btn-outline-primary">
-                All Products
-            </a>
-            <br>
-             <a href="?filter=my" class="btn btn-outline-primary">
-               My Products
-            </a>
-        </div>
-        <br>
-
-        <div class="row justify-content-center " >
-            {% for product in product_list %}
-            <div class="card col-3  mx-2 my-2 p-3" style="width: 18rem;">
-                <img src="{{ product.thumbnail }}" class="card-img-top" width="200px" height="200px" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title"><a href="{% url 'main:show_product_id' product.id %}">{{ product.name }}</a> </h5>
-
-                    <p class="card-text"><small class="text-body-secondary"> 
-                        Category: {{ product.get_category_display }} 
-                        <br>Stock: {{ product.stock }},  
-                        Price: {{ product.price }} 
-                        <br>
-                        {% if product.user %}
-                        Seller: {{ product.user.username }}
-                        {% else %}
-                        Seller: Anonymous
-                        {% endif %}
-                    </small></p>
-                    <p class="card-text">{{ product.description|truncatechars:150 }}</p>
-                    <p class="card-text"><small class="text-body-secondary">Last updated {{ product.updated_at|timesince }} ago</small></p>
-                    {% if user.is_authenticated and product.user == user %}
-
-                    <a href="{% url 'main:edit_product' product.id %}" class="btn btn-warning">Edit</a>
-                    <a href="{% url 'main:delete_product' product.id %}" class="btn btn-danger">Delete</a>
-                    {% endif %}
-                </div>
-            </div>
-            {% endfor %}
-            
-            
-            
-        </div>
-    
-    {% else %}
-
-        <div class="d-flex justify-content-center" style="margin-top: 10%;">
-            <img src="{% static 'image/not_found.png' %}" alt="No product found" >
-            <h3>PRODUCT NOT FOUND <br> <small style="color: rgb(142, 10, 10);">please check again later</small> </h3>
-        </div>
-    {% endif %}
-
-    
-
+<div class="container">
+  <div class="d-flex align-items-center mb-2">
+    <div>
+      <button id="refresh-btn" class="btn btn-outline-secondary me-2">Refresh</button>
+      <button id="add-btn" class="btn btn-primary">Add Product</button>
     </div>
+  </div>
 
-   
+  <div class="btn-group d-flex justify-content-center mb-4" role="group">
+    <button class="btn btn-outline-primary product-filter active"
+            data-url="{% url 'main:show_product_json' %}">
+      All Products
+    </button>
+    <button class="btn btn-outline-primary product-filter"
+            data-url="{% url 'main:show_my_product_json' %}">
+      My Products
+    </button>
+  </div>
+
+  <div id="product-show" class="row justify-content-center"></div>
+</div>
 
 
+{% include 'product_modal.html' %}
+{% include 'toast.html' %}
+{% include 'state_loading.html' %}
+{% include 'state_empty.html' %}
+{% include 'state_error.html' %}
 
-{% endblock %}
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+  const productShow = document.getElementById("product-show")
+  const filterButtons = document.querySelectorAll(".product-filter")
+  const modal = new bootstrap.Modal(document.getElementById("productModal"))
+  const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"))
+  const toastElement = new bootstrap.Toast(document.getElementById("toast"))
+  const toastBody = document.getElementById("toast-body")
+  const addBtn = document.getElementById("add-btn")
+  const refreshBtn = document.getElementById("refresh-btn")
+  let deleteId = null
+
+  const currentUserId = "{{ request.user.id }}"
+
+  const loadingHTML = document.getElementById("state-loading").outerHTML
+  const emptyHTML   = document.getElementById("state-empty").outerHTML
+  const errorHTML   = document.getElementById("state-error").outerHTML
+  document.getElementById("state-loading").remove()
+  document.getElementById("state-empty").remove()
+  document.getElementById("state-error").remove()
+
+  function escapeHtml(str) {
+    if (str === null || str === undefined){
+      return ""
+    } 
+    return String(str)
+      .replace(/&/g, "&amp")
+      .replace(/</g, "&lt")
+      .replace(/>/g, "&gt")
+      .replace(/"/g, "&quot")
+      .replace(/'/g, "&#39")
+  }
+
+  function showToast(msg, isError=false){
+    const toastEl = document.getElementById("toast")
+    toastEl.className = "toast align-items-center border-0"
+    toastEl.classList.add(isError ? "text-bg-danger" : "text-bg-success")
+    toastBody.textContent = msg
+    toastElement.show()
+  }
+
+
+  const categorySelect = document.getElementById("category")  
+  let categoriesLoaded = false  
+
+  function populateCategorySelect(categories) {
+      categorySelect.innerHTML = '<option value="">Select Category</option>'
+      categories.forEach(category => {
+          const option = document.createElement("option")
+          option.value = category.value
+          option.textContent = category.label
+          categorySelect.appendChild(option)
+      })
+      categoriesLoaded = true
+  }
+
+  function parseResponse(data) {
+      
+    if (data.products && data.categories) {
+        if (!categoriesLoaded) {
+            populateCategorySelect(data.categories)
+        }
+        
+
+        const products = []
+        if (Array.isArray(data.products)) {
+            data.products.forEach(item => {
+                products.push({
+                    id: item.pk,
+                    name: item.fields.name,
+                    price: item.fields.price,
+                    stock: item.fields.stock,
+                    category: item.fields.category,
+                    description: item.fields.description,
+                    thumbnail: item.fields.thumbnail,
+                    is_featured: item.fields.is_featured,
+                    updated_at: item.fields.updated_at,
+                    user_id: item.fields.user ,
+                    username: item.fields.username
+                })
+            })
+        }
+        return products
+    }
+    
+    if (Array.isArray(data)) {
+        if (!categoriesLoaded) {
+            const fallbackCategories = [
+                {value: 'outdoor', label: 'Outdoor Items'},
+                {value: 'indoor', label: 'Indoor Items'}
+            ]
+            populateCategorySelect(fallbackCategories)
+        }
+        
+        return data.map(item => ({
+            id: item.pk,
+            name: item.fields.name,
+            price: item.fields.price,
+            stock: item.fields.stock,
+            category: item.fields.category,
+            description: item.fields.description,
+            thumbnail: item.fields.thumbnail,
+            is_featured: !!item.fields.is_featured,
+            updated_at: item.fields.updated_at,
+            user_id: item.fields.user,
+            username: item.fields.username
+        }))
+    }
+    
+    return []
+  }
+  async function fetchProducts(url) {
+    productShow.innerHTML = loadingHTML
+    
+    try {
+      const response = await fetch(url, { 
+        headers: { 
+          "X-Requested-With": "XMLHttpRequest",
+        } 
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const data = await response.json()
+      const products = parseResponse(data)
+
+      if (products.length === 0) {
+        productShow.innerHTML = emptyHTML
+        return
+      }
+
+      renderProductList(products)
+      
+    } catch (err) {
+      console.error("fetchProducts error:", err)
+      productShow.innerHTML = errorHTML
+      showToast("Error loading products", true)
+    }
+  }
+
+
+  function renderProductList(products) {
+    productShow.innerHTML = ""
+    const fallbackImage = "{% static 'image/no_image.png' %}"
+
+    products.forEach(product => {
+      const card = document.createElement("div")
+      card.className = "card col-3 mx-2 my-3 p-3 shadow-sm"
+      card.style.width = "18rem"
+      card.dataset.product = JSON.stringify(product)
+
+      const img = document.createElement("img")
+      img.className = "card-img-top"
+      img.style.height = "200px"
+      img.style.objectFit = "cover"
+      img.alt = product.name
+      img.src = product.thumbnail && product.thumbnail.trim() !== "" ? product.thumbnail : fallbackImage
+      img.onerror = () => { img.src = fallbackImage }
+
+      const body = document.createElement("div")
+      body.className = "card-body d-flex flex-column"
+
+      const title = document.createElement("h5")
+      title.className = "card-title"
+      title.textContent = product.name
+
+
+      const info = document.createElement("p")
+      info.className = "card-text"
+      info.innerHTML = `<small>Category: ${escapeHtml(product.category)}<br>Stock: ${escapeHtml(product.stock)}<br>Price: ${escapeHtml(product.price)}</small><br>Seller: ${escapeHtml(product.username)}</small>`
+
+      const desc = document.createElement("p")
+      desc.className = "card-text flex-grow-1"
+      const shortDesc = product.description ? product.description.substring(0, 80) : ""
+      desc.textContent = shortDesc + (product.description && product.description.length > 80 ? "..." : "")
+
+      const updated = document.createElement("p")
+      updated.className = "card-text text-muted mb-2"
+      const updatedDisplay = product.updated_at ? new Date(product.updated_at).toLocaleString("en-GB", {
+        day: "2-digit", 
+        month: "short", 
+        year: "numeric", 
+        hour: "2-digit", 
+        minute: "2-digit"
+      }) : "-"
+      updated.innerHTML = `<small>Last updated: ${escapeHtml(updatedDisplay)}</small>`
+
+      const actions = document.createElement("div")
+      actions.className = "mt-auto"
+
+      if (product.user_id && product.user_id.toString() === currentUserId) {
+        const editBtn = document.createElement("button")
+        editBtn.className = "btn btn-sm btn-warning me-1 btn-edit"
+        editBtn.type = "button"
+        editBtn.textContent = "Edit"
+
+        const delBtn = document.createElement("button")
+        delBtn.className = "btn btn-sm btn-danger btn-delete"
+        delBtn.type = "button"
+        delBtn.textContent = "Delete"
+
+        actions.appendChild(editBtn)
+        actions.appendChild(delBtn)
+      } 
+
+      body.appendChild(title)
+      body.appendChild(info)
+      body.appendChild(desc)
+      body.appendChild(updated)
+      body.appendChild(actions)
+
+      card.appendChild(img)
+      card.appendChild(body)
+
+      productShow.appendChild(card)
+    })
+  }
+
+
+  productShow.addEventListener("click", (ev) => {
+    const editBtn = ev.target.closest(".btn-edit")
+    const delBtn = ev.target.closest(".btn-delete")
+    
+    if (editBtn) {
+      const card = editBtn.closest(".card")
+      if (!card) return
+      const product = JSON.parse(card.dataset.product || "{}")
+      openEditModal(product)
+    } else if (delBtn) {
+      const card = delBtn.closest(".card")
+      if (!card) return
+      const product = JSON.parse(card.dataset.product || "{}")
+      confirmDelete(product.id)
+    }
+  })
+
+
+  function openEditModal(product) {
+    document.getElementById("modalTitle").textContent = "Edit Product"
+    document.getElementById("product-id").value = product.id || ""
+    document.getElementById("name").value = product.name || ""
+    document.getElementById("price").value = product.price || ""
+    document.getElementById("stock").value = product.stock || ""
+    document.getElementById("category").value = product.category || ""
+    document.getElementById("description").value = product.description || ""
+    document.getElementById("thumbnail").value = product.thumbnail || ""
+
+    if (product.category && categoriesLoaded) {
+        categorySelect.value = product.category
+    } else {
+        categorySelect.value = ""
+    }
+
+    modal.show()
+  }
+
+
+  addBtn.addEventListener("click", () => {
+    document.getElementById("modalTitle").textContent = "Add Product"
+    document.getElementById("product-form").reset()
+    document.getElementById("product-id").value = ""
+    if (categoriesLoaded) {
+      categorySelect.value = ""
+    }
+    modal.show()
+  })
+
+  document.getElementById("product-form").addEventListener("submit", async (e) => {
+    e.preventDefault()
+    
+    const id = document.getElementById("product-id").value
+    const isEdit = !!id
+    const url = isEdit ? "{% url 'main:edit_product' 0 %}".replace('0', id) : "{% url 'main:create_product' %}"
+    
+    const formData = new FormData()
+    formData.append('name', document.getElementById("name").value)
+    formData.append('price', document.getElementById("price").value)
+    formData.append('stock', document.getElementById("stock").value)
+    formData.append('category', document.getElementById("category").value)
+    formData.append('description', document.getElementById("description").value)
+    formData.append('thumbnail', document.getElementById("thumbnail").value)
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.msg )
+        modal.hide()
+        const activeUrl = document.querySelector(".product-filter.active").dataset.url
+        fetchProducts(activeUrl)
+      } else {
+        showToast(data.msg, true)
+      }
+    } catch (err) {
+      showToast("Request error", true)
+    }
+  })
+
+
+  function confirmDelete(id) {
+    deleteId = id
+    deleteModal.show()
+  }
+
+  document.getElementById("confirmDelete").addEventListener("click", async () => {
+    if (!deleteId) return
+    
+    try {
+      const formData = new FormData()
+      formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+      
+      const url = "{% url 'main:delete_product' 0 %}".replace('0', deleteId)
+      
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: formData,
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        showToast(data.msg )
+        deleteModal.hide()
+        const activeUrl = document.querySelector(".product-filter.active").dataset.url
+        fetchProducts(activeUrl)
+      } else {
+        showToast(data.msg, true)
+      }
+    } catch (err) {
+      showToast("Request error", true)
+    }
+  })
+
+  filterButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      filterButtons.forEach(b => b.classList.remove("active"))
+      btn.classList.add("active")
+      fetchProducts(btn.dataset.url)
+    })
+  })
+
+  refreshBtn.addEventListener("click", () => {
+    const activeUrl = document.querySelector(".product-filter.active").dataset.url
+    fetchProducts(activeUrl)
+    showToast("Products refreshed!")
+  })
+
+  const defaultUrl = document.querySelector(".product-filter.active").dataset.url
+  fetchProducts(defaultUrl)
+})
+</script>
