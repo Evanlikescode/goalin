@@ -31,62 +31,80 @@
 {% include 'state_error.html' %}
 
 <script>
+// DOMContentLoaded --> membiarkan semua HTML show dlu, lalu eksekusi script
 document.addEventListener("DOMContentLoaded", () => {
 
-  const productShow = document.getElementById("product-show")
-  const filterButtons = document.querySelectorAll(".product-filter")
-  const modal = new bootstrap.Modal(document.getElementById("productModal"))
-  const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal"))
-  const toastElement = new bootstrap.Toast(document.getElementById("toast"))
-  const toastBody = document.getElementById("toast-body")
-  const addBtn = document.getElementById("add-btn")
-  const refreshBtn = document.getElementById("refresh-btn")
-  let deleteId = null
+  const productShow = document.getElementById("product-show") // get div tag productShow
+  const filterButtons = document.querySelectorAll(".product-filter") // mengambil btn filter
+  const modal = new bootstrap.Modal(document.getElementById("productModal")) // membuat control product modal via bootstrap
+  const deleteModal = new bootstrap.Modal(document.getElementById("deleteModal")) // membuat control delete modal via bootstrap
+  const toastElement = new bootstrap.Toast(document.getElementById("toast")) // membuat control toast via bootstrap
+  const toastBody = document.getElementById("toast-body") // get div tag toast body
+  const addBtn = document.getElementById("add-btn") // get add btn
+  const refreshBtn = document.getElementById("refresh-btn") // get refresh btn
+  let deleteId = null // standby variable untuk deleteId
 
-  const currentUserId = "{{ request.user.id }}"
+  const currentUserId = "{{ request.user.id }}" // get current user id
 
-  const loadingHTML = document.getElementById("state-loading").outerHTML
-  const emptyHTML = document.getElementById("state-empty").outerHTML
-  const errorHTML = document.getElementById("state-error").outerHTML
+  const loadingHTML = document.getElementById("state-loading").outerHTML // menyimpan keseluruhan tag state-loading
+  const emptyHTML = document.getElementById("state-empty").outerHTML // menyimpan keseluruhan tag state-empty
+  const errorHTML = document.getElementById("state-error").outerHTML // menyimpan keseluruhan tag state-error
+  // remove dari tampilan awal dlu, karena belum dipake
   document.getElementById("state-loading").remove()
   document.getElementById("state-empty").remove()
   document.getElementById("state-error").remove()
 
-
+  // fungsi untuk menampilkan toast
   function showToast(msg, isError=false){
-    const toastEl = document.getElementById("toast")
-    toastEl.className = "toast align-items-center border-0"
+    const toastEl = document.getElementById("toast") // get div toast
+    // mengubah classes agar sesuai
+    toastEl.className = "toast align-items-center border-0" 
+    // kalo error nanti tampil danger, kalo berhasil nanti yg success
     toastEl.classList.add(isError ? "text-bg-danger" : "text-bg-success")
+    // menambahkan isi textnay dengan message
     toastBody.textContent = msg
+    // show toastnya
     toastElement.show()
   }
 
 
-  const categorySelect = document.getElementById("category")  
-  let categoriesLoaded = false  
+  const categorySelect = document.getElementById("category")  // get tag select
+  let categoriesLoaded = false  // standby value untuk menandakan kalo categories udah loaded atau belum
 
+  // fungsi untuk menambahkan value pada category
   function renderCategorySelect(categories) {
+      // menambahkan tag option
       categorySelect.innerHTML = '<option value="">Select Category</option>'
+      // looping categories
       categories.forEach(category => {
+          // membuat tag option setiap looping
           const option = document.createElement("option")
+          // mengisi valuenya
           option.value = category.value
+          // membuat inner dari optionnya
           option.textContent = category.label
+          // memasukkannya ke tag select
           categorySelect.appendChild(option)
       })
+      // ubabh ke true
       categoriesLoaded = true
   }
 
   function parseResponse(data) {
-      
+    // cek data products sama categories exist atau tidak
     if (data.products && data.categories) {
+        // cek categories udah loaded atau belum
         if (!categoriesLoaded) {
             renderCategorySelect(data.categories)
         }
         
-
-        const products = []
+        
+        const products = [] // menampung data product
+        // cek data product array atau bukan
         if (Array.isArray(data.products)) {
+            // looping data product
             data.products.forEach(item => {
+                // push ke array products
                 products.push({
                     id: item.pk,
                     name: item.fields.name,
@@ -105,65 +123,47 @@ document.addEventListener("DOMContentLoaded", () => {
         return products
     }
     
-    if (Array.isArray(data)) {
-        if (!categoriesLoaded) {
-            const fallbackCategories = [
-                {value: 'outdoor', label: 'Outdoor Items'},
-                {value: 'indoor', label: 'Indoor Items'}
-            ]
-            renderCategorySelect(fallbackCategories)
-        }
-        
-        return data.map(item => ({
-            id: item.pk,
-            name: item.fields.name,
-            price: item.fields.price,
-            stock: item.fields.stock,
-            category: item.fields.category,
-            description: item.fields.description,
-            thumbnail: item.fields.thumbnail,
-            is_featured: !!item.fields.is_featured,
-            updated_at: item.fields.updated_at,
-            user_id: item.fields.user,
-            username: item.fields.username
-        }))
-    }
-    
-    return []
+
+    return [] // return array kosong kalo gada
   }
+
   async function fetchProducts(url) {
-    productShow.innerHTML = loadingHTML
-    
+    productShow.innerHTML = loadingHTML // menampilkan loading
+    // bikin try and catch untuk handle response
     try {
+
+      // fetch ke url server
       const response = await fetch(url, { 
         headers: { 
-          "X-Requested-With": "XMLHttpRequest",
+          "X-Requested-With": "XMLHttpRequest", // membuat header XMLHttpRequest agar server tau kalo ada ajax request
         } 
       })
 
-      const data = await response.json()
-      const products = parseResponse(data)
-
+      const data = await response.json() // mendapatkan response dalam bentuk json
+      const products = parseResponse(data) // parsing datanya
+      // cek array product kosong atau tidak
       if (products.length == 0) {
-        productShow.innerHTML = emptyHTML
+        productShow.innerHTML = emptyHTML // inner html akan jadi product not found
         return
       }
-
+      // kalo tidak kosong, maka render product
       renderProductList(products)
       
     } catch (err) {
+      // ini kalo error
       productShow.innerHTML = errorHTML
       showToast("Error loading products", true)
     }
   }
 
   function getTimeAgo(date) {
-    const now = new Date()
-    const diffMs = now - date
-    const diffMins = Math.floor(diffMs / 60000)
-    const diffHours = Math.floor(diffMs / 3600000)
-    const diffDays = Math.floor(diffMs / 86400000)
+    const now = new Date() // mendapatkan date sekarang
+    const diffMs = now - date // mengurangkan dengan date product dibikin
+    const diffMins = Math.floor(diffMs / 60000) // mengubah jadi menit
+    const diffHours = Math.floor(diffMs / 3600000) // mengubah jadi jam
+    const diffDays = Math.floor(diffMs / 86400000) // mengubah jadi hari
 
+    // checking
     if (diffMins < 1) return 'just now'
     if (diffMins < 60) return `${diffMins} minutes ago`
     if (diffHours < 24) return `${diffHours} hours ago`
@@ -244,25 +244,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   productShow.addEventListener("click", (ev) => {
-    const editBtn = ev.target.closest(".btn-edit")
-    const delBtn = ev.target.closest(".btn-delete")
+    const editBtn = ev.target.closest(".btn-edit") // cari btn edit
+    const delBtn = ev.target.closest(".btn-delete") // cari btn delete
     
     if (editBtn) {
-      const card = editBtn.closest(".card")
+      const card = editBtn.closest(".card") // cari card yang mana
       if (!card) return
-      const product = JSON.parse(card.dataset.product || "{}")
-      openEditModal(product)
+      const product = JSON.parse(card.dataset.product || "{}") // parse dari JSON ke javascript object
+      openEditModal(product) // kirim ke fungsi edit modal
     } else if (delBtn) {
-      const card = delBtn.closest(".card")
+      const card = delBtn.closest(".card") // cari card yang mana
       if (!card) return
-      const product = JSON.parse(card.dataset.product || "{}")
-      confirmDelete(product.id)
+      const product = JSON.parse(card.dataset.product || "{}") // parse dari JSON ke javascript object
+      confirmDelete(product.id) // kirim idnya ke confirmDelete
     }
   })
 
-
+  // fungsi untuk edit modal
   function openEditModal(product) {
+    // menambahkan tulisan edit product
     document.getElementById("modalTitle").textContent = "Edit Product"
+    // mengisi data-data yang diberikan
     document.getElementById("product-id").value = product.id || ""
     document.getElementById("name").value = product.name || ""
     document.getElementById("price").value = product.price || ""
@@ -281,27 +283,31 @@ document.addEventListener("DOMContentLoaded", () => {
     modal.show()
   }
 
-
+  // add btn di click
   addBtn.addEventListener("click", () => {
+    // modal ganti ke add product
     document.getElementById("modalTitle").textContent = "Add Product"
+    // reset form
     document.getElementById("product-form").reset()
     document.getElementById("product-id").value = ""
     document.getElementById("is_featured").checked = false
-
+    // mengosongkan value categorySelect
     if (categoriesLoaded) {
       categorySelect.value = ""
     }
+    // show modal
     modal.show()
   })
 
   document.getElementById("product-form").addEventListener("submit", async (e) => {
-    e.preventDefault()
+    e.preventDefault() // mencegah browser langsung reload
     
-    const id = document.getElementById("product-id").value
-    const isEdit = !!id
+    const id = document.getElementById("product-id").value // get id
+    const isEdit = !!id // mengubah id ke boolean val (kalo kosong atau string kosong --> false; kalo ada isinya maka true)
+    // persiapkan url yang sesuai
     const url = isEdit ? "{% url 'main:edit_product' 0 %}".replace('0', id) : "{% url 'main:create_product' %}"
     
-    const formData = new FormData()
+    const formData = new FormData() // deklarasi formData untuk mengumpulkan semua data form
     formData.append('name', document.getElementById("name").value)
     formData.append('price', document.getElementById("price").value)
     formData.append('stock', document.getElementById("stock").value)
@@ -309,9 +315,10 @@ document.addEventListener("DOMContentLoaded", () => {
     formData.append('description', document.getElementById("description").value)
     formData.append('thumbnail', document.getElementById("thumbnail").value)
     formData.append('is_featured', document.getElementById("is_featured").checked)
-    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
+    formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value) // mendapatkan csrf token
 
     try {
+      // kirim data
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -320,36 +327,36 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       })
 
-      const data = await response.json()
-
+      const data = await response.json() // cek response
+      
       if (data.success) {
-        showToast(data.msg )
-        modal.hide()
-        const activeUrl = document.querySelector(".product-filter.active").dataset.url
-        fetchProducts(activeUrl)
+        showToast(data.msg ) // showToast
+        modal.hide() // hide modal add/edit product
+        const activeUrl = document.querySelector(".product-filter.active").dataset.url // get url dari product filter yang active
+        fetchProducts(activeUrl) // fetch ulang product
       } else {
-        showToast(data.msg, true)
+        showToast(data.msg, true) // toast jadi error, tampillin msgnya
       }
     } catch (err) {
-      showToast("Request error", true)
+      showToast("Request error", true) 
     }
   })
 
 
   function confirmDelete(id) {
-    deleteId = id
-    deleteModal.show()
+    deleteId = id // masukkin id product
+    deleteModal.show() // show modal delete
   }
-
+  // kalo btn confirmdelete diklik
   document.getElementById("confirmDelete").addEventListener("click", async () => {
-    if (!deleteId) return
+    if (!deleteId) return // cek deleteId ada atau gk
     
     try {
-      const formData = new FormData()
-      formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value)
-      
+      const formData = new FormData() // make formData
+      formData.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value) // masukkan csrfnya
+      // set url
       const url = "{% url 'main:delete_product' 0 %}".replace('0', deleteId)
-      
+      // bikin request ke server
       const response = await fetch(url, {
         method: "POST",
         headers: {
@@ -358,13 +365,13 @@ document.addEventListener("DOMContentLoaded", () => {
         body: formData,
       })
 
-      const data = await response.json()
+      const data = await response.json() // fetch responsenya
 
       if (data.success) {
-        showToast(data.msg )
-        deleteModal.hide()
-        const activeUrl = document.querySelector(".product-filter.active").dataset.url
-        fetchProducts(activeUrl)
+        showToast(data.msg ) // show toast
+        deleteModal.hide() // hide modalnya
+        const activeUrl = document.querySelector(".product-filter.active").dataset.url // fetch url dari filter btn yang active
+        fetchProducts(activeUrl) // fetch ulang
       } else {
         showToast(data.msg, true)
       }
@@ -375,9 +382,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   filterButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      filterButtons.forEach(b => b.classList.remove("active"))
-      btn.classList.add("active")
-      fetchProducts(btn.dataset.url)
+      filterButtons.forEach(b => b.classList.remove("active")) // remove semua yang active dlu
+      btn.classList.add("active") // tambahin yg active ke btn yg diklik
+      fetchProducts(btn.dataset.url) // fetch productnya
     })
   })
 
