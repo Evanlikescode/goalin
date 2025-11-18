@@ -204,6 +204,74 @@ def show_my_product_json(request):
     })
 
 @login_required(login_url="/login")
+def show_asc_product_json(request):
+
+    categories = []
+    for cat in Product.category_choices:
+        categories.append({
+            'value': cat[0],
+            'label': cat[1]
+        })
+
+    product_list = Product.objects.all().order_by("price")
+    products_data = []
+    for product in product_list:
+        products_data.append({
+            'pk': product.pk,
+            'fields': {
+                'name': product.name,
+                'price': product.price,
+                'stock': product.stock,
+                'category': product.get_category_display(),
+                'description': product.description,
+                'thumbnail': product.thumbnail,
+                'is_featured': product.is_featured,
+                'updated_at': product.updated_at.isoformat() if product.updated_at else None,
+                'user': product.user.id if product.user else None,
+                'username': product.user.username if product.user else "Anonymous"
+            }
+    })
+    return JsonResponse({
+        "products": products_data,
+        "categories": categories
+    })
+
+@login_required(login_url="/login")
+def show_desc_product_json(request):
+
+    categories = []
+    for cat in Product.category_choices:
+        categories.append({
+            'value': cat[0],
+            'label': cat[1]
+        })
+
+    product_list = Product.objects.all().order_by("-price")
+    products_data = []
+    for product in product_list:
+        products_data.append({
+            'pk': product.pk,
+            'fields': {
+                'name': product.name,
+                'price': product.price,
+                'stock': product.stock,
+                'category': product.get_category_display(),
+                'description': product.description,
+                'thumbnail': product.thumbnail,
+                'is_featured': product.is_featured,
+                'updated_at': product.updated_at.isoformat() if product.updated_at else None,
+                'user': product.user.id if product.user else None,
+                'username': product.user.username if product.user else "Anonymous"
+            }
+    })
+    return JsonResponse({
+        "products": products_data,
+        "categories": categories
+    })
+
+
+
+@login_required(login_url="/login")
 def show_product_xml(request, id=None):
     if id is None:
         product_list = Product.objects.all()

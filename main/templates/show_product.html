@@ -18,7 +18,19 @@
             data-url="{% url 'main:show_my_product_json' %}">
       My Products
     </button>
+
+     <button class="btn btn-outline-primary product-filter"
+            data-url="{% url 'main:show_asc_product_json' %}">
+      Asc Products
+    </button>
+
+     <button class="btn btn-outline-primary product-filter"
+            data-url="{% url 'main:show_desc_product_json' %}">
+      Desc Products
+    </button>
   </div>
+
+  
 
   <div id="product-show" class="row justify-content-center"></div>
 </div>
