@@ -1,5 +1,5 @@
 from django.urls import path
-from main.views import landing_page, create_product, show_product, show_product_json, show_product_xml, register_user, login_user, logout_user, edit_product, delete_product, show_my_product_json, show_asc_product_json, show_desc_product_json, show_product_json_dart, show_my_product_json_dart
+from main.views import landing_page, create_product, show_product, show_product_json, show_product_xml, register_user, login_user, logout_user, edit_product, delete_product, show_my_product_json, show_asc_product_json, show_desc_product_json, show_product_json_dart, show_my_product_json_dart, proxy_image, create_product_flutter
 
 app_name = 'main'
 
@@ -18,9 +18,11 @@ urlpatterns = [
     path('xml/product/', show_product_xml, name='show_product_xml'),
     path('xml/product/<str:id>/', show_product_xml, name='show_product_xml_id'),
 
-    path('json/product/dart/', show_product_json_dart, name='show_product_json_dart' ),
-    path('json/product/my/dart/', show_my_product_json_dart, name='show_my_product_json_dart' ),
-    
+    path('json/dart/product/', show_product_json_dart, name='show_product_json_dart' ),
+    path('json/dart/product/my/', show_my_product_json_dart, name='show_my_product_json_dart' ),
+    path('proxy-image/', proxy_image, name='proxy_image'),
+    path('create-product-flutter/', create_product_flutter, name="create_product_flutter"),
+
     path('register/', register_user, name="register_user" ),
     path('login/', login_user, name="login_user" ),
     path('logout/', logout_user, name="logout_user" ),

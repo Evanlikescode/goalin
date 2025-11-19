@@ -10,9 +10,10 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 
+from django.utils.html import strip_tags
 from django.http import HttpResponseRedirect
 from django.urls import reverse
-
+import requests, json
 from django.contrib import messages
 
 # Create your views here.
@@ -183,9 +184,9 @@ def show_product_json_dart(request):
             'description': product.description,
             'thumbnail': product.thumbnail,
             'is_featured': product.is_featured,
+            'created_at': product.created_at.isoformat() if product.created_at else None,
             'updated_at': product.updated_at.isoformat() if product.updated_at else None,
-            'user': product.user.id if product.user else None,
-            'username': product.user.username if product.user else "Anonymous"
+           
             }
         )
     
@@ -204,16 +205,60 @@ def show_my_product_json_dart(request):
             'description': product.description,
             'thumbnail': product.thumbnail,
             'is_featured': product.is_featured,
+
+            'created_at': product.created_at.isoformat() if product.created_at else None,
             'updated_at': product.updated_at.isoformat() if product.updated_at else None,
-            'user': product.user.id if product.user else None,
-            'username': product.user.username if product.user else "Anonymous"
+           
             }
         )
     
     return JsonResponse(products_data, safe=False)
 
+def proxy_image(request):
+    image_url = request.GET.get('url')
+    if not image_url:
+        return HttpResponse('No URL provided', status=400)
+    
+    try:
+        response = requests.get(image_url, timeout=10)
+        response.raise_for_status()
+        
+        return HttpResponse(
+            response.content,
+            content_type=response.headers.get('Content-Type', 'image/jpeg')
+        )
+    except requests.RequestException as e:
+        return HttpResponse(f'Error fetching image: {str(e)}', status=500)
 
 
+@csrf_exempt
+def create_product_flutter(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        name = strip_tags(data.get("name", ""))  
+        description = strip_tags(data.get("description", ""))  
+        price = data.get("price", 0)
+        stock = data.get("stock", 0)
+        category = data.get("category", "")
+        thumbnail = data.get("thumbnail", "")
+        is_featured = data.get("is_featured", False)
+        user = request.user
+        
+        new_product = Product(
+            name=name, 
+            description=description,
+            price = price,
+            stock = stock,
+            category=category,
+            thumbnail=thumbnail,
+            is_featured=is_featured,
+            user=user
+        )
+        new_product.save()
+        
+        return JsonResponse({"status": "success"}, status=200)
+    else:
+        return JsonResponse({"status": "error"}, status=401)
 def show_my_product_json(request):
 
     categories = []
