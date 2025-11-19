@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
 from django.contrib.auth.models import User
@@ -24,7 +24,7 @@ def login_user(request):
                 "username": user.username,
                 "status": True,
                 "message": "Login successful!"
-            }, status = 201)
+            }, status = 200)
 
         else:
             return JsonResponse({
@@ -52,13 +52,13 @@ def register_user(request):
             return JsonResponse({
                 "status": False,
                 "message": "Passwords do not match. Please check them again!"
-            }, status=401)
+            }, status=400)
         
         if User.objects.filter(username=username).exists():
             return JsonResponse({
                 "status": False,
                 "message": "Username already exists."
-            }, status=401)
+            }, status=400)
         
         # create new user
         user = User.objects.create_user(username=username, password=password_1)
@@ -68,10 +68,27 @@ def register_user(request):
             "status": 'success',
             "username": user.username,
             "message": "User created successfully!"
-        }, status=201)
+        }, status=200)
     
     else:
         return JsonResponse({
             "status": False,
             "message": "Invalid request method."
+        }, status=400)
+
+
+@csrf_exempt
+def logout_user(request):
+    username = request.user.username
+    try:
+        logout(request)
+        return JsonResponse({
+            "username": username,
+            "status": True,
+            "message": "Logged out successfully!"
+        }, status=200)
+    except:
+        return JsonResponse({
+            "status": False,
+            "message": "Logout failed."
         }, status=401)
